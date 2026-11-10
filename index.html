@@ -1,0 +1,2209 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Love House · 情侣空间</title>
+<style>
+/* ========== 全局重置与变量 ========== */
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --primary:#ffb6c1;--primary-dark:#ff8da1;--text:#222;--text-light:#888;
+  --radius:20px;--font:-apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue",Arial,sans-serif;
+  --header-h:46px;
+  --glass-bg:rgba(255,255,255,.55);
+  --glass-border:rgba(255,255,255,.65);
+  --glass-shadow:0 8px 32px rgba(0,0,0,.06);
+  --font-base:13px;
+}
+body{
+  font-family:var(--font);
+  background:linear-gradient(135deg,#f5f0ff 0%,#fdf0f5 40%,#eef5ff 100%);
+  background-attachment:fixed;color:var(--text);
+  height:100vh;height:100dvh;overflow:hidden;
+  display:flex;flex-direction:column;font-size:var(--font-base);
+  -webkit-font-smoothing:antialiased;
+}
+::-webkit-scrollbar{width:3px;height:3px}
+::-webkit-scrollbar-thumb{background:rgba(0,0,0,.15);border-radius:10px}
+
+/* ========== 应用骨架 ========== */
+#app{display:flex;flex-direction:column;height:100%;width:100%;overflow:hidden}
+.app-header{
+  height:var(--header-h);background:var(--glass-bg);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--glass-border);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 16px;flex-shrink:0;z-index:100;position:relative;
+}
+.app-header-title{font-size:16px;font-weight:600;color:#111}
+.nav-back{
+  display:none;align-items:center;gap:5px;font-size:14px;font-weight:600;
+  cursor:pointer;color:#111;
+}
+.nav-back svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.app-main{flex:1;position:relative;overflow:hidden;display:flex;flex-direction:column}
+
+/* ========== 通用页面 ========== */
+.page{
+  display:none;position:absolute;top:0;left:0;right:0;bottom:0;
+  overflow-y:auto;overflow-x:hidden;padding:0 14px 18px;
+  -webkit-overflow-scrolling:touch;overscroll-behavior:contain;
+}
+.page.active{display:block;animation:fadeSlideIn .2s ease-out forwards}
+@keyframes fadeSlideIn{from{opacity:0;transform:translateX(10px)}to{opacity:1;transform:translateX(0)}}
+
+/* ========== 主页 ========== */
+.home-container{display:flex;flex-direction:column;gap:14px;min-height:100%;padding-bottom:10px;flex:1}
+.couple-card{
+  border-radius:22px;padding:20px 18px;display:flex;align-items:center;justify-content:center;
+  gap:26px;position:relative;cursor:pointer;
+  background:var(--glass-bg);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border:1px solid var(--glass-border);box-shadow:var(--glass-shadow);
+}
+.couple-person{display:flex;flex-direction:column;align-items:center;gap:10px;z-index:1}
+.couple-avatar{
+  width:66px;height:66px;border-radius:50%;background:rgba(255,255,255,.7);
+  overflow:hidden;display:flex;align-items:center;justify-content:center;
+  font-size:24px;color:#555;font-weight:600;border:2px solid #fff;
+  box-shadow:0 4px 10px rgba(0,0,0,.08);
+}
+.couple-avatar img{width:100%;height:100%;object-fit:cover}
+.couple-name{
+  font-size:12px;color:#444;background:rgba(255,255,255,.7);
+  padding:3px 14px;border-radius:20px;border:1px solid var(--glass-border);font-weight:500;
+}
+.couple-heart-icon{width:18px;height:18px;fill:none;stroke:#333;stroke-width:2;margin-bottom:22px;z-index:1}
+.paw-decor{position:absolute;font-size:18px;opacity:.12}
+.paw-1{top:10%;left:15%;transform:rotate(-20deg)}.paw-2{top:10%;right:15%;transform:rotate(20deg)}
+.paw-3{bottom:10%;left:15%;transform:rotate(20deg)}.paw-4{bottom:10%;right:15%;transform:rotate(-20deg)}
+.time-card{
+  background:var(--glass-bg);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border:1px solid var(--glass-border);border-radius:18px;padding:16px 0;text-align:center;
+  box-shadow:0 8px 32px rgba(255,182,193,.15);position:relative;
+}
+.time-display{font-size:32px;font-weight:500;color:#b59a9f;letter-spacing:1px;margin-bottom:4px}
+.date-display{font-size:12px;color:#b59a9f}
+.days-edit-btn{
+  position:absolute;top:8px;right:10px;font-size:10px;color:#ff8da1;
+  background:rgba(255,255,255,.7);padding:2px 8px;border-radius:10px;cursor:pointer;
+  border:1px solid rgba(255,182,193,.4);
+}
+.desktop-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px 10px;padding:8px 0}
+.app-icon{display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer}
+.icon-box{
+  width:54px;height:54px;background:rgba(255,255,255,.65);
+  backdrop-filter:blur(15px);-webkit-backdrop-filter:blur(15px);
+  border:1px solid var(--glass-border);border-radius:16px;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 12px rgba(0,0,0,.05);position:relative;
+}
+.icon-box svg{width:25px;height:25px;fill:none;stroke:#222;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.app-name{font-size:11px;color:#555;font-weight:500}
+.app-badge{
+  position:absolute;top:-4px;right:-4px;min-width:18px;height:18px;
+  background:#fff;color:#000;font-size:10px;font-weight:700;border-radius:9px;
+  display:flex;align-items:center;justify-content:center;padding:0 5px;
+  box-shadow:0 2px 6px rgba(0,0,0,.15);border:1px solid #eee;
+}
+.bottom-toolbar{
+  margin-top:auto;background:var(--glass-bg);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border:1px solid var(--glass-border);border-radius:22px;padding:14px 0;
+  display:flex;justify-content:space-around;align-items:center;box-shadow:var(--glass-shadow);
+}
+.tool-btn{width:40px;height:40px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#222}
+.tool-btn svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+/* ========== 列表/设置 ========== */
+.list-container{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.list-item{
+  display:flex;align-items:center;gap:12px;padding:12px 14px;
+  background:var(--glass-bg);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border:1px solid var(--glass-border);border-radius:var(--radius);cursor:pointer;
+  box-shadow:0 4px 16px rgba(0,0,0,.04);
+}
+.list-avatar{
+  width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.7);
+  display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:600;
+  color:#555;overflow:hidden;flex-shrink:0;
+}
+.list-avatar img{width:100%;height:100%;object-fit:cover}
+.list-info{flex:1;min-width:0}
+.list-title{font-size:14px;font-weight:600;color:#333}
+.list-desc{font-size:12px;color:#999;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card-box{
+  background:var(--glass-bg);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border:1px solid var(--glass-border);border-radius:var(--radius);padding:14px;
+  margin-bottom:10px;box-shadow:var(--glass-shadow);
+}
+.card-box h4{font-size:14px;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.card-box h4 svg{width:18px;height:18px;fill:none;stroke:var(--primary-dark);stroke-width:2}
+.row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:9px 0;border-bottom:1px solid rgba(0,0,0,.06);
+  font-size:13px;min-height:40px;
+}
+.row:last-child{border-bottom:none}
+.row .val{color:var(--text-light);font-size:12px;text-align:right}
+.toggle{
+  width:40px;height:22px;border-radius:11px;background:rgba(0,0,0,.1);
+  position:relative;cursor:pointer;transition:.2s;flex-shrink:0;
+}
+.toggle::after{
+  content:'';position:absolute;width:18px;height:18px;border-radius:50%;
+  background:#fff;top:2px;left:2px;transition:.2s;
+}
+.toggle.on{background:var(--primary)}
+.toggle.on::after{transform:translateX(18px)}
+.slider-row{display:flex;align-items:center;gap:10px;padding:9px 0;flex-wrap:wrap}
+.slider-row input[type=range]{
+  flex:1;min-width:90px;height:4px;-webkit-appearance:none;
+  background:rgba(0,0,0,.1);border-radius:2px;outline:none;
+}
+.slider-row input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:16px;height:16px;border-radius:50%;
+  background:var(--primary-dark);cursor:pointer;
+}
+.slider-row .slider-val{min-width:46px;text-align:right;font-size:12px;color:var(--primary-dark);font-weight:600}
+.action-row{display:flex;gap:8px;margin-top:6px;flex-wrap:wrap}
+.btn-sm{padding:5px 12px;border-radius:9px;border:none;font-size:11px;font-weight:600;cursor:pointer}
+.btn-pri{background:var(--primary);color:#fff}
+.btn-out{background:rgba(255,255,255,.6);color:var(--text-light);border:1px solid rgba(255,255,255,.7)}
+.css-editor{
+  width:100%;min-height:90px;padding:10px;border-radius:12px;
+  border:1px solid rgba(255,255,255,.7);font-family:monospace;font-size:12px;
+  background:rgba(255,255,255,.5);outline:none;resize:vertical;
+}
+.wallpaper-preview{
+  width:100%;height:90px;border-radius:12px;background:rgba(255,255,255,.5);
+  margin-bottom:8px;background-size:cover;background-position:center;
+}
+
+/* ========== 聊天界面 ========== */
+.chat-page{
+  position:fixed;top:0;left:0;width:100%;height:100%;
+  background:rgba(255,255,255,.4);backdrop-filter:blur(25px);-webkit-backdrop-filter:blur(25px);
+  z-index:1000;display:flex;flex-direction:column;
+  transform:translateX(100%);transition:transform .25s cubic-bezier(.2,.8,.2,1);
+}
+.chat-page.active{transform:translateX(0)}
+.chat-header{
+  padding:18px 12px 4px;display:flex;align-items:center;gap:8px;
+  background:rgba(255,255,255,.4);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-bottom:1px solid rgba(255,255,255,.5);flex-shrink:0;
+}
+.chat-back-btn{
+  width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.6);
+  border:1px solid rgba(255,255,255,.7);display:flex;align-items:center;justify-content:center;
+  cursor:pointer;flex-shrink:0;
+}
+.chat-back-btn svg{width:13px;height:13px;fill:none;stroke:#333;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.chat-header-avatar{
+  width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.7);
+  overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  font-weight:600;color:#555;font-size:11px;
+}
+.chat-header-avatar img{width:100%;height:100%;object-fit:cover}
+.chat-header-name{
+  font-size:13px;color:#333;font-weight:600;display:flex;align-items:center;
+  gap:4px;flex:1;min-width:0;
+}
+.chat-header-name svg{width:11px;height:11px;stroke:#999;stroke-width:2;flex-shrink:0}
+.chat-header-call{
+  width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;margin-right:4px;color:#222;
+}
+.chat-header-call svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+.chat-messages{
+  flex:1;overflow-y:auto;padding:14px 16px 18px;
+  display:flex;flex-direction:column;gap:16px;-webkit-overflow-scrolling:touch;
+}
+.msg-row{display:flex;align-items:flex-start;gap:10px;max-width:85%;position:relative}
+.msg-row.recv{align-self:flex-start;flex-direction:row}
+.msg-row.sent{align-self:flex-end;flex-direction:row-reverse}
+.msg-avatar{
+  width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.7);
+  overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  font-weight:600;color:#555;font-size:13px;
+}
+.msg-avatar img{width:100%;height:100%;object-fit:cover}
+.msg-bubble-wrap{display:flex;flex-direction:column;min-width:0}
+.msg-bubble{padding:10px 15px;font-size:14px;line-height:1.5;word-break:break-word;border-radius:20px;user-select:none}
+.msg-row.recv .msg-bubble{background:rgba(255,255,255,.78);color:#222}
+.msg-row.sent .msg-bubble{background:rgba(34,34,34,.88);color:#fff}
+.msg-bubble.selected-quote{box-shadow:0 0 0 2px var(--primary-dark)}
+.msg-meta{display:flex;align-items:center;gap:5px;font-size:11px;color:#aaa;margin-top:5px;padding:0 4px}
+.msg-row.sent .msg-meta{justify-content:flex-end}
+.msg-read-text{font-size:10px;color:#4a90d9;font-weight:500}
+.msg-quote{
+  padding:5px 9px;border-left:3px solid rgba(0,0,0,.15);
+  background:rgba(0,0,0,.05);border-radius:8px;font-size:11px;color:#666;
+  margin-bottom:5px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.msg-row.sent .msg-quote{background:rgba(255,255,255,.15);border-left-color:rgba(255,255,255,.5);color:rgba(255,255,255,.8)}
+.msg-quote .quote-name{font-weight:600;margin-right:4px}
+
+.quote-preview-bar{
+  display:none;padding:7px 14px;background:rgba(255,255,255,.6);
+  border-left:3px solid var(--primary);margin:0 16px 5px;border-radius:6px;
+  font-size:12px;color:#666;
+}
+.quote-preview-bar.active{display:flex;align-items:center;justify-content:space-between}
+.quote-preview-bar .quote-content{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.quote-preview-bar .quote-close{
+  width:18px;height:18px;border-radius:50%;background:rgba(0,0,0,.1);
+  display:flex;align-items:center;justify-content:center;cursor:pointer;
+  flex-shrink:0;margin-left:8px;font-size:11px;color:#666;
+}
+
+/* ===== 问问Ta卡片（白色固定，不受主题影响） ===== */
+.qa-card{
+  background:#fff !important;
+  border-radius:14px;
+  padding:12px;
+  width:210px;
+  box-shadow:0 2px 8px rgba(0,0,0,.08) !important;
+  border:1px solid #f0f0f0 !important;
+  color:#222 !important;
+}
+.qa-title{
+  font-size:13px;
+  font-weight:600;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  margin-bottom:7px;
+  color:#333 !important;
+}
+.qa-title svg{width:14px;height:14px;stroke:var(--primary-dark);fill:none;stroke-width:2}
+.qa-question{
+  font-size:13px;
+  font-weight:600;
+  margin-bottom:9px;
+  color:#222 !important;
+}
+.qa-option-btn{
+  padding:9px 11px;
+  border:1px solid #eee !important;
+  border-radius:10px;
+  margin-bottom:5px;
+  cursor:pointer;
+  font-size:13px;
+  background:#fafafa !important;
+  color:#222 !important;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+.qa-option-btn.chosen{
+  border-color:var(--primary) !important;
+  background:rgba(255,240,245,.9) !important;
+}
+.qa-option-btn .check{width:14px;height:14px;border-radius:50%;background:var(--primary);display:flex;align-items:center;justify-content:center}
+.qa-option-btn .check::after{content:'✓';color:#fff;font-size:10px}
+.qa-status{
+  font-size:11px;
+  color:var(--primary-dark) !important;
+  font-weight:500;
+  text-align:right;
+  margin-top:3px;
+}
+
+/* ===== 通话记录卡片（白色固定，不受主题影响） ===== */
+.call-record-card{
+  background:#fff !important;
+  border-radius:12px;
+  padding:11px;
+  width:190px;
+  box-shadow:0 2px 10px rgba(0,0,0,.05) !important;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  border:1px solid #f0f0f0 !important;
+  color:#222 !important;
+}
+.call-record-icon{
+  width:34px;
+  height:34px;
+  border-radius:50%;
+  background:rgba(52,199,89,.1);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#34c759;
+  flex-shrink:0;
+}
+.call-record-icon.missed{background:rgba(255,59,48,.1);color:#ff3b30}
+.call-record-icon.voice{background:rgba(74,144,217,.1);color:#4a90d9}
+.call-record-icon svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2}
+.call-record-info{flex:1;min-width:0}
+.call-record-title{
+  font-size:13px;
+  font-weight:600;
+  color:#333 !important;
+}
+.call-record-desc{
+  font-size:11px;
+  color:#999 !important;
+  margin-top:2px;
+}
+
+.divine-card{
+  width:195px;background:rgba(255,255,255,.92);border-radius:14px;
+  overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,.12);cursor:pointer;
+  border:1px solid rgba(255,255,255,.8);
+}
+.divine-card .dc-type{font-size:9px;font-weight:700;letter-spacing:1px;padding:5px 9px;color:#fff}
+.divine-card .dc-type.tarot{background:linear-gradient(135deg,#6a4ca0,#8f6fc4)}
+.divine-card .dc-type.lenormand{background:linear-gradient(135deg,#2d7f9e,#4fa8c9)}
+.divine-card .dc-image{height:130px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;background:#f5f0e8}
+.divine-card .dc-image img{width:100%;height:100%;object-fit:cover}
+.divine-card .dc-image .dc-symbol{font-size:50px}
+.divine-card .dc-name{font-size:13px;font-weight:700;color:#222;padding:7px 9px 2px;text-align:center}
+.divine-card .dc-meaning{font-size:10px;color:#888;line-height:1.5;padding:2px 9px 9px;text-align:center}
+
+.typing-indicator{
+  align-self:flex-start;display:flex;align-items:center;gap:7px;
+  padding:10px 14px;background:rgba(255,255,255,.7);border-radius:20px;
+  font-size:13px;color:#888;
+}
+.typing-dots{display:flex;gap:3px;align-items:center}
+.typing-dots span{width:5px;height:5px;background:#aaa;border-radius:50%;display:inline-block;animation:bounce 1.2s infinite ease-in-out}
+.typing-dots span:nth-child(2){animation-delay:.2s}
+.typing-dots span:nth-child(3){animation-delay:.4s}
+@keyframes bounce{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-3px);opacity:1}}
+
+.chat-input-area{
+  padding:8px 16px calc(16px + env(safe-area-inset-bottom));
+  background:rgba(255,255,255,.4);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-top:1px solid rgba(255,255,255,.5);display:flex;flex-direction:column;flex-shrink:0;
+}
+.input-bar{display:flex;align-items:center;gap:10px}
+.plus-btn{
+  width:40px;height:40px;border-radius:50%;border:1px solid rgba(255,255,255,.7);
+  background:rgba(255,255,255,.6);display:flex;align-items:center;justify-content:center;
+  cursor:pointer;flex-shrink:0;
+}
+.plus-btn svg{width:18px;height:18px;stroke:#333;stroke-width:2;fill:none;stroke-linecap:round}
+.input-wrapper{
+  flex:1;height:40px;border-radius:20px;border:1px solid rgba(255,255,255,.7);
+  background:rgba(255,255,255,.6);display:flex;align-items:center;padding:0 6px 0 14px;
+}
+.input-wrapper input{flex:1;border:none;outline:none;font-size:14px;background:transparent}
+.send-circle-btn{
+  width:30px;height:30px;border-radius:50%;background:#222;border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.send-circle-btn svg{width:16px;height:16px;stroke:#fff;stroke-width:2.5;fill:none;stroke-linecap:round;stroke-linejoin:round}
+
+.panel{
+  position:fixed;bottom:74px;left:0;width:100%;background:rgba(255,255,255,.7);
+  backdrop-filter:blur(25px);-webkit-backdrop-filter:blur(25px);
+  border-top:1px solid rgba(255,255,255,.6);padding:10px 14px;z-index:1001;
+  display:none;flex-direction:column;gap:10px;border-radius:16px 16px 0 0;
+}
+.panel.active{display:flex}
+.panel-actions{display:flex;justify-content:space-around;padding-bottom:10px;border-bottom:1px solid rgba(0,0,0,.06)}
+.panel-action-btn{display:flex;flex-direction:column;align-items:center;gap:5px;background:transparent;border:none;font-size:11px;color:#666;cursor:pointer}
+.panel-action-btn .icon-box{width:44px;height:44px;background:rgba(255,255,255,.6);border-radius:12px;display:flex;align-items:center;justify-content:center}
+.panel-action-btn .icon-box svg{width:22px;height:22px;fill:none;stroke:#333;stroke-width:2}
+.emoji-tabs{display:flex;gap:5px;margin-bottom:3px}
+.e-tab{padding:4px 11px;border-radius:11px;font-size:12px;background:transparent;border:none;color:#666;cursor:pointer}
+.e-tab.active{background:#222;color:#fff;font-weight:600}
+.emoji-grid{display:flex;flex-wrap:wrap;gap:5px;max-height:160px;overflow-y:auto}
+.e-item{padding:5px 9px;background:rgba(255,255,255,.6);border-radius:9px;cursor:pointer;font-size:13px}
+.e-item img{width:36px;height:36px;object-fit:cover;border-radius:7px}
+
+/* ========== 通话界面（语音） ========== */
+.call-page{
+  position:fixed;top:0;left:0;width:100%;height:100%;z-index:3000;
+  display:flex;flex-direction:column;background:linear-gradient(180deg,#2a3143 0%,#111625 100%);
+  color:#fff;transform:translateY(100%);transition:transform .3s cubic-bezier(.2,.8,.2,1);
+}
+.call-page.active{transform:translateY(0)}
+.call-top{display:flex;justify-content:space-between;align-items:center;padding:44px 20px 18px;flex-shrink:0}
+.call-status{background:rgba(255,255,255,.1);padding:5px 14px;border-radius:18px;font-size:13px;display:flex;align-items:center;gap:7px}
+.call-status .dot{width:7px;height:7px;background:#34c759;border-radius:50%;animation:pulse 1.5s infinite}
+@keyframes pulse{0%{opacity:1;box-shadow:0 0 0 0 rgba(52,199,89,.7)}70%{opacity:.7;box-shadow:0 0 0 8px rgba(52,199,89,0)}100%{opacity:1;box-shadow:0 0 0 0 rgba(52,199,89,0)}}
+.call-top-actions{display:flex;gap:10px}
+.call-action-btn{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;cursor:pointer;border:none}
+.call-action-btn svg{width:18px;height:18px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+.call-center{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;margin-top:-50px}
+.call-avatar-wrap{position:relative;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;margin-bottom:8px}
+.call-avatar-wrap::before,.call-avatar-wrap::after{content:'';position:absolute;inset:0;border-radius:50%;border:1px solid rgba(255,255,255,.1);animation:ripple 2s infinite cubic-bezier(0,0,.2,1)}
+.call-avatar-wrap::after{animation-delay:1s}
+@keyframes ripple{0%{transform:scale(1);opacity:1}100%{transform:scale(1.5);opacity:0}}
+.call-avatar{width:96px;height:96px;border-radius:50%;background:rgba(255,255,255,.9);overflow:hidden;border:2px solid #fff;display:flex;align-items:center;justify-content:center;font-size:34px;color:#333}
+.call-avatar img{width:100%;height:100%;object-fit:cover}
+.call-name{font-size:24px;font-weight:600;letter-spacing:1px}
+.call-tip{font-size:14px;color:rgba(255,255,255,.6);display:flex;align-items:center;gap:6px}
+.call-tip svg{width:15px;height:15px;fill:currentColor}
+.call-pages{display:flex;gap:7px;margin-top:18px}
+.call-page-dot{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.3)}
+.call-page-dot.active{background:#fff}
+
+.call-bottom{display:flex;justify-content:space-between;align-items:center;padding:26px 36px 44px;flex-shrink:0}
+.call-bottom-btn{width:54px;height:54px;border-radius:50%;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;cursor:pointer;border:none;color:#fff}
+.call-bottom-btn svg{width:25px;height:25px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.call-bottom-btn.hangup{width:68px;height:68px;background:#ff3b30;box-shadow:0 0 20px rgba(255,59,48,.4)}
+.call-bottom-btn.hangup svg{width:32px;height:32px}
+.call-bottom-btn.mute-active{background:rgba(255,255,255,.3)}
+
+/* ========== 【重点】画中画 - 全局悬浮 ========== */
+.call-mini{
+  position:fixed;
+  right:12px;
+  top:44px;
+  width: 160px; 
+  height: 46px; 
+  border-radius: 23px; 
+  background: #1e2434; 
+  z-index: 999999; 
+  display:none;
+  align-items:center;
+  padding: 3px 3px 3px 8px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.45);
+  cursor:grab;
+  border: 1px solid rgba(255,255,255,.1);
+  touch-action:none;
+}
+.call-mini.active{display:flex}
+.call-mini.dragging{cursor:grabbing}
+
+/* 左侧头像 */
+.call-mini-avatar{
+  width: 34px;
+  height: 34px;
+  border-radius: 10px; 
+  background: #fff;
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-shrink:0;
+  border: 1px solid rgba(255,255,255,.2);
+}
+.call-mini-avatar img{width:100%;height:100%;object-fit:cover}
+
+/* 中间信息 */
+.call-mini-info{
+  flex:1;
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  margin-left: 8px;
+  justify-content: center;
+  gap: 1px;
+}
+.call-mini-name{
+  font-size: 12px; 
+  color:#fff;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+.call-mini-timer{
+  font-size: 10px; 
+  color: #8b94a7; 
+  line-height:1.2;
+  letter-spacing: 0.5px;
+}
+
+/* 右侧绿点 */
+.call-mini-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #34c759;
+  margin: 0 6px;
+  flex-shrink: 0;
+  box-shadow: 0 0 6px rgba(52,199,89,0.8);
+}
+
+/* 最右侧红色挂断按钮 */
+.call-mini-close{
+  width: 34px; 
+  height: 34px; 
+  border-radius: 50%;
+  background: #c74545;
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-shrink:0;
+  cursor:pointer;
+  transition: background 0.2s;
+}
+.call-mini-close:hover {
+  background: #ff3b30;
+}
+.call-mini-close svg {
+  width: 18px; 
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* ========== 其他页面样式 ========== */
+.moments-page,.diary-page,.mailbox-page,.game-page,.store-page,.divine-page{
+  position:fixed;top:0;left:0;width:100%;height:100%;z-index:1000;
+  display:flex;flex-direction:column;transform:translateX(100%);
+  transition:transform .25s cubic-bezier(.2,.8,.2,1);
+}
+.moments-page{background:rgba(247,248,250,.4);backdrop-filter:blur(25px);overflow-y:auto}
+.moments-page.active{transform:translateX(0)}
+.moments-cover{height:260px;background:linear-gradient(135deg,rgba(255,209,220,.8) 0%,rgba(255,182,193,.8) 50%,rgba(251,194,235,.8) 100%);position:relative;flex-shrink:0}
+.moments-nav{display:flex;align-items:center;justify-content:space-between;padding:36px 18px 0;position:relative;z-index:10}
+.moments-nav svg{width:22px;height:22px;fill:none;stroke:#333;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;cursor:pointer}
+.moments-nav-title{font-size:16px;font-weight:600;color:#333}
+.moments-cover-text{position:absolute;top:90px;right:18px;text-align:right;letter-spacing:2px}
+.moments-cover-text h2{font-size:22px;font-weight:400;margin-bottom:50px;opacity:.8;color:#fff}
+.moments-cover-text p{font-size:13px;opacity:.9;font-style:italic;color:#fff}
+.moments-cover-avatar{position:absolute;bottom:-26px;right:18px;width:70px;height:70px;border-radius:14px;border:3px solid rgba(255,255,255,.8);background:rgba(255,255,255,.6);overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:28px;color:#555}
+.moments-cover-avatar img{width:100%;height:100%;object-fit:cover}
+.moments-feed{background:rgba(255,255,255,.7);padding:18px;border-radius:16px 16px 0 0;min-height:calc(100% - 240px);padding-bottom:36px;flex:1}
+.moment-item{padding:14px 0;border-bottom:1px solid rgba(0,0,0,.06)}
+.moment-item:last-child{border-bottom:none}
+.moment-header{display:flex;gap:10px;margin-bottom:8px}
+.moment-avatar{width:40px;height:40px;border-radius:9px;background:rgba(255,255,255,.7);overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:16px;color:#555}
+.moment-avatar img{width:100%;height:100%;object-fit:cover}
+.moment-nickname{font-size:14px;font-weight:600;color:#ff8da1;margin-top:3px}
+.moment-content{font-size:13px;line-height:1.6;color:#333;margin-bottom:10px;padding-left:50px;white-space:pre-wrap}
+.moment-images{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;padding-left:50px}
+.moment-images img{width:90px;height:90px;border-radius:8px;object-fit:cover}
+.moment-comments{background:rgba(0,0,0,.04);border-radius:8px;padding:10px;margin-left:50px;margin-bottom:10px}
+.comment-item{font-size:12px;line-height:1.6;margin-bottom:5px}
+.comment-item:last-child{margin-bottom:0}
+.comment-name{color:#ff8da1;font-weight:500;margin-right:4px}
+.comment-text{color:#333}
+.comment-del{font-size:11px;color:#bbb;margin-left:5px;cursor:pointer}
+.moment-footer{display:flex;justify-content:space-between;align-items:center;padding-left:50px}
+.moment-time{font-size:11px;color:#999}
+.moment-actions{display:flex;gap:14px;align-items:center}
+.moment-actions svg{width:18px;height:18px;fill:none;stroke:#999;stroke-width:2;cursor:pointer}
+.moment-actions .liked{stroke:#ff4757;fill:#ff4757}
+.action-count{font-size:11px;color:#999;margin-left:4px;display:flex;align-items:center}
+
+.diary-page{background:rgba(247,248,250,.4);backdrop-filter:blur(25px)}
+.diary-page.active{transform:translateX(0)}
+.diary-header{padding:36px 18px 8px;display:flex;align-items:center;gap:14px;flex-shrink:0}
+.diary-header .back-btn{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.7);display:flex;align-items:center;justify-content:center;cursor:pointer}
+.diary-header .back-btn svg{width:18px;height:18px;fill:none;stroke:#333;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.diary-header .title{font-size:16px;font-weight:600;flex:1}
+.diary-month-nav{display:flex;align-items:center;gap:10px}
+.diary-month-nav button{background:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.7);width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;color:#555}
+.diary-month-label{font-size:14px;font-weight:600;color:#333;min-width:90px;text-align:center}
+.diary-content{flex:1;padding:8px 18px 18px;overflow-y:auto}
+.calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:8px}
+.calendar-weekday{text-align:center;font-size:11px;color:#999;padding:5px 0;font-weight:500}
+.calendar-cell{aspect-ratio:1;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;font-size:13px;color:#333;position:relative;background:rgba(255,255,255,.4);min-height:40px}
+.calendar-cell.empty{background:transparent;cursor:default}
+.calendar-cell.today{border:2px solid var(--primary-dark);font-weight:700}
+.calendar-cell .day-num{font-size:13px}
+.calendar-cell .day-emoji{font-size:16px;line-height:1;margin-top:2px}
+.calendar-cell.has-mood{background:rgba(255,240,245,.8)}
+.diary-detail-card{background:rgba(255,255,255,.6);border-radius:18px;padding:16px;margin-top:14px;box-shadow:0 4px 16px rgba(0,0,0,.04)}
+.diary-detail-date{font-size:14px;font-weight:600;color:#333;margin-bottom:14px;display:flex;justify-content:space-between}
+.diary-mood-row{display:flex;gap:18px;margin-bottom:14px}
+.diary-mood-item{flex:1;text-align:center}
+.diary-mood-item .label{font-size:12px;color:#666;margin-bottom:7px}
+.diary-mood-item .emoji-big{font-size:32px}
+.diary-emoji-row{display:flex;gap:9px;flex-wrap:wrap;border-top:1px dashed rgba(0,0,0,.06);padding-top:10px}
+.diary-emoji-row .hint{font-size:12px;color:#999;margin-bottom:7px;width:100%}
+.emoji-opt{width:40px;height:40px;border-radius:11px;background:rgba(255,255,255,.5);display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer}
+.emoji-opt.active{background:rgba(255,240,245,.8);border:2px solid var(--primary);transform:scale(1.08)}
+
+.mailbox-page{background:rgba(247,248,250,.4);backdrop-filter:blur(25px)}
+.mailbox-page.active{transform:translateX(0)}
+.mailbox-header{padding:36px 18px 8px;display:flex;align-items:center;gap:14px}
+.mailbox-header .back-btn{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.7);display:flex;align-items:center;justify-content:center;cursor:pointer}
+.mailbox-header .back-btn svg{width:18px;height:18px;fill:none;stroke:#333;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.mailbox-header .title{font-size:16px;font-weight:600;flex:1}
+.mailbox-content{flex:1;padding:14px 18px 18px;overflow-y:auto}
+.mail-card{background:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.7);border-radius:18px;padding:16px;margin-bottom:12px;box-shadow:0 4px 16px rgba(0,0,0,.04)}
+.mail-card.unread{border-left:4px solid var(--primary)}
+.mail-card .mail-from{font-size:13px;font-weight:600;color:var(--primary-dark);margin-bottom:5px;display:flex;align-items:center;gap:6px}
+.mail-card .mail-time{font-size:11px;color:#999;font-weight:normal;margin-left:auto}
+.mail-card .mail-body{font-size:13px;line-height:1.7;color:#333;white-space:pre-wrap;margin-top:7px}
+.mail-card .mail-actions{margin-top:10px;display:flex;gap:7px;justify-content:flex-end}
+.mail-card .mail-actions button{padding:5px 12px;border-radius:9px;border:none;font-size:11px;font-weight:600;cursor:pointer}
+.letter-editor{display:flex;flex-direction:column;gap:10px}
+.letter-editor textarea{width:100%;min-height:140px;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,.7);font-family:inherit;font-size:13px;line-height:1.6;background:rgba(255,255,255,.5);outline:none;resize:vertical}
+.letter-editor .letter-paper{background:repeating-linear-gradient(transparent,transparent 24px,rgba(0,0,0,.05) 24px,rgba(0,0,0,.05) 25px);border-radius:12px;padding:12px}
+
+.game-page{background:rgba(247,248,250,.4);backdrop-filter:blur(25px)}
+.game-page.active{transform:translateX(0)}
+.game-header{padding:36px 18px 8px;display:flex;align-items:center;gap:14px;flex-shrink:0}
+.game-header .back-btn{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.7);display:flex;align-items:center;justify-content:center;cursor:pointer}
+.game-header .back-btn svg{width:18px;height:18px;fill:none;stroke:#333;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.game-header .title{font-size:16px;font-weight:600}
+.game-content{flex:1;padding:8px 18px 18px;overflow-y:auto}
+.game-select-card{display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.55);border:1px solid rgba(255,255,255,.6);border-radius:18px;padding:16px;margin-bottom:12px;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.04)}
+.game-select-icon{width:50px;height:50px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+.game-select-info{flex:1}
+.game-select-info h3{font-size:14px;font-weight:600;color:#333;margin-bottom:3px}
+.game-select-info p{font-size:12px;color:#999}
+.gomoku-board{display:grid;grid-template-columns:repeat(15,1fr);gap:0;background:#deb887;border-radius:8px;padding:5px;max-width:100%;aspect-ratio:1;box-shadow:0 4px 16px rgba(0,0,0,.15);margin:0 auto}
+.gomoku-cell{position:relative;aspect-ratio:1;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.gomoku-cell::before{content:'';position:absolute;top:50%;left:0;right:0;height:1px;background:#8b7355;transform:translateY(-50%)}
+.gomoku-cell::after{content:'';position:absolute;left:50%;top:0;bottom:0;width:1px;background:#8b7355;transform:translateX(-50%)}
+.gomoku-cell .stone{width:80%;height:80%;border-radius:50%;position:relative;z-index:2;box-shadow:0 2px 4px rgba(0,0,0,.3)}
+.gomoku-cell .stone.black{background:radial-gradient(circle at 35% 35%,#555,#000)}
+.gomoku-cell .stone.white{background:radial-gradient(circle at 35% 35%,#fff,#ccc)}
+.gomoku-cell .stone.last-move{box-shadow:0 0 0 2px #ff4757,0 2px 4px rgba(0,0,0,.3)}
+.gomoku-status{text-align:center;font-size:13px;font-weight:600;color:#333;padding:10px;background:rgba(255,255,255,.5);border-radius:12px;margin-bottom:10px}
+.gomoku-status .turn-dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:middle}
+.gomoku-status .turn-dot.black{background:#000}
+.gomoku-status .turn-dot.white{background:#fff;border:1px solid #999}
+.gomoku-options{display:flex;justify-content:center;gap:10px;margin-top:10px;flex-wrap:wrap}
+.rps-choices{display:flex;justify-content:center;gap:18px;margin:20px 0}
+.rps-choice{width:70px;height:70px;border-radius:18px;background:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.7);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;font-size:18px}
+.rps-choice.selected{border-color:var(--primary-dark);background:rgba(255,240,245,.9);transform:scale(1.04)}
+.rps-result{text-align:center;font-size:16px;font-weight:600;color:#333;padding:18px;background:rgba(255,255,255,.5);border-radius:14px;min-height:70px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:7px}
+.rps-result .big-emoji{font-size:22px;color:#999}
+.rps-result .vs{font-size:13px;color:#999}
+
+.divine-page{background:linear-gradient(160deg,#1a1030 0%,#2a1a4a 50%,#1a1535 100%);color:#eee}
+.divine-page.active{transform:translateX(0)}
+.divine-header{padding:36px 18px 8px;display:flex;align-items:center;gap:14px;flex-shrink:0}
+.divine-header .back-btn{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;cursor:pointer}
+.divine-header .back-btn svg{width:18px;height:18px;fill:none;stroke:#fff;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.divine-header .title{font-size:16px;font-weight:600;color:#f0e6ff}
+.divine-content{flex:1;padding:8px 18px 26px;overflow-y:auto;display:flex;flex-direction:column}
+.divine-intro{text-align:center;padding:16px 0 8px}
+.divine-intro .moon-icon{font-size:42px;margin-bottom:10px;display:block}
+.divine-intro h2{font-size:20px;font-weight:600;color:#e8ddff;margin-bottom:7px;letter-spacing:2px}
+.divine-intro p{font-size:12px;color:rgba(220,210,255,.6);line-height:1.7}
+.divine-question-box{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:14px;padding:14px;margin:14px 0}
+.divine-question-box label{font-size:12px;color:rgba(220,210,255,.7);display:block;margin-bottom:7px}
+.divine-question-box input{width:100%;padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:#fff;font-size:13px;outline:none;font-family:inherit}
+.divine-question-box input::placeholder{color:rgba(255,255,255,.35)}
+.divine-draw-btn{width:100%;padding:14px;border-radius:14px;border:none;background:linear-gradient(135deg,#8f6fc4,#b88fe8);color:#fff;font-size:14px;font-weight:700;cursor:pointer;letter-spacing:2px;box-shadow:0 8px 24px rgba(143,111,196,.4)}
+.divine-draw-btn:disabled{opacity:.5;cursor:not-allowed}
+.divine-cards{display:flex;justify-content:center;gap:8px;margin:20px 0;flex-wrap:wrap}
+.divine-card-slot{width:90px;min-height:145px;border-radius:11px;position:relative;perspective:600px}
+.divine-card-face{width:100%;height:100%;min-height:145px;border-radius:11px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:5px;text-align:center;transition:transform .5s cubic-bezier(.2,.8,.2,1);transform-style:preserve-3d;overflow:hidden}
+.divine-card-back{background:linear-gradient(145deg,#3a2860,#241840);border:1px solid rgba(180,140,255,.4);box-shadow:0 6px 20px rgba(0,0,0,.4);color:rgba(200,180,255,.6);font-size:32px}
+.divine-card-front{background:linear-gradient(160deg,#fff8ee,#f0e6d8);color:#2a1a3a;box-shadow:0 6px 24px rgba(0,0,0,.4),0 0 0 2px rgba(180,140,255,.5);opacity:0;position:absolute;inset:0;transform:rotateY(180deg);backface-visibility:hidden}
+.divine-card-front img{width:100%;height:100%;object-fit:cover;border-radius:9px}
+.divine-card-front .card-symbol{font-size:36px;margin-bottom:5px}
+.divine-card-front .card-name{font-size:11px;font-weight:700;color:#3a2860;margin-bottom:3px;line-height:1.3}
+.divine-card-front .card-meaning{font-size:8px;color:#7a6a5a;line-height:1.35}
+.divine-card-slot.flipped .divine-card-back{transform:rotateY(180deg);opacity:0}
+.divine-card-slot.flipped .divine-card-front{transform:rotateY(0deg);opacity:1}
+.divine-result-text{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:14px;font-size:13px;color:rgba(230,220,255,.85);line-height:1.8;margin-top:7px}
+.divine-result-text .qt{color:#b88fe8;font-weight:600}
+
+.store-page{background:rgba(247,248,250,.4);backdrop-filter:blur(25px)}
+.store-page.active{transform:translateX(0)}
+.store-header{padding:36px 18px 8px;display:flex;align-items:center;gap:14px;flex-shrink:0}
+.store-header .back-btn{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.7);display:flex;align-items:center;justify-content:center;cursor:pointer}
+.store-header .back-btn svg{width:18px;height:18px;fill:none;stroke:#333;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.store-header .title{font-size:16px;font-weight:600}
+.store-content{flex:1;padding:8px 18px 18px;overflow-y:auto}
+.theme-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.theme-card{background:rgba(255,255,255,.55);border:1px solid rgba(255,255,255,.6);border-radius:16px;overflow:hidden;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.04)}
+.theme-preview{height:100px;display:flex;align-items:center;justify-content:center}
+.theme-preview .theme-msg-demo{display:flex;flex-direction:column;gap:6px;width:80%}
+.theme-preview .theme-bubble-demo{padding:6px 10px;border-radius:12px;font-size:10px;max-width:80%}
+.theme-preview .theme-bubble-demo.recv{align-self:flex-start}
+.theme-preview .theme-bubble-demo.sent{align-self:flex-end}
+.theme-info{padding:10px;text-align:center}
+.theme-name{font-size:13px;font-weight:600;color:#333}
+.theme-status{font-size:11px;color:var(--primary-dark);margin-top:3px}
+.theme-card.active-theme{border:2px solid var(--primary-dark)}
+
+.modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.35);z-index:2000;display:none;align-items:center;justify-content:center;padding:18px}
+.modal-overlay.active{display:flex}
+.modal-box{background:rgba(255,255,255,.85);width:100%;max-width:320px;border-radius:22px;padding:20px;box-shadow:0 10px 40px rgba(0,0,0,.1);max-height:85vh;overflow-y:auto}
+.modal-box h3{font-size:16px;margin-bottom:14px;text-align:center;font-weight:600}
+.form-group{margin-bottom:10px}
+.form-group label{display:block;font-size:12px;color:#666;margin-bottom:3px}
+.form-group input,.form-group textarea,.form-group select{width:100%;padding:9px;border-radius:11px;border:1px solid rgba(0,0,0,.1);font-family:inherit;font-size:13px;outline:none;background:rgba(255,255,255,.6)}
+.m-actions{display:flex;gap:8px;margin-top:18px}
+.m-actions button{flex:1;padding:11px;border-radius:11px;border:none;font-weight:600;font-size:14px;cursor:pointer}
+.m-cancel{background:rgba(0,0,0,.08);color:#333}
+.m-confirm{background:#222;color:#fff}
+.c-tab{padding:4px 12px;border-radius:14px;font-size:12px;cursor:pointer;border:1px solid rgba(0,0,0,.1);background:rgba(255,255,255,.5);color:var(--text-light)}
+.c-tab.active{background:#222;color:#fff;border-color:#222;font-weight:600}
+.card-list-item{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.5);padding:5px 9px;border-radius:9px;font-size:12px;margin:0 5px 5px 0}
+.card-list-item img{width:36px;height:36px;object-fit:cover;border-radius:7px}
+.del-btn{color:#ff4757;cursor:pointer;font-size:15px;margin-left:2px}
+
+.toast-notification{position:fixed;top:-120px;left:50%;transform:translateX(-50%);width:calc(100% - 20px);max-width:400px;background:rgba(255,255,255,.95);border-radius:14px;box-shadow:0 8px 30px rgba(0,0,0,.15);z-index:2500;display:flex;align-items:center;gap:10px;padding:10px 14px;transition:top .4s cubic-bezier(.2,.8,.2,1),opacity .3s;opacity:0;cursor:pointer;border:1px solid rgba(0,0,0,.05)}
+.toast-notification.show{top:14px;opacity:1}
+.toast-avatar{width:40px;height:40px;border-radius:50%;background:var(--primary);overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:600;color:#fff;font-size:16px}
+.toast-avatar img{width:100%;height:100%;object-fit:cover}
+.toast-content{flex:1;min-width:0}
+.toast-name{font-size:14px;font-weight:600;color:#333;margin-bottom:2px}
+.toast-message{font-size:12px;color:#666;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.toast-close{width:22px;height:22px;border-radius:50%;background:rgba(0,0,0,.05);display:flex;align-items:center;justify-content:center;font-size:13px;color:#999;flex-shrink:0;cursor:pointer}
+
+/* ========== 【主题与壁纸解耦方案】 ========== */
+/* 微信主题（仅作用于气泡，背景透明让壁纸漏出来） */
+body.theme-wechat .msg-bubble{padding:8px 10px;border-radius:5px;font-size:13px;line-height:1.45;position:relative}
+body.theme-wechat .msg-row.recv .msg-bubble{background:#fff!important;color:#111!important}
+body.theme-wechat .msg-row.sent .msg-bubble{background:#95ec69!important;color:#111!important}
+body.theme-wechat .msg-row.recv .msg-bubble::before{content:'';position:absolute;left:-5px;top:10px;width:0;height:0;border-top:4px solid transparent;border-bottom:4px solid transparent;border-right:5px solid #fff}
+body.theme-wechat .msg-row.sent .msg-bubble::before{content:'';position:absolute;right:-5px;top:10px;width:0;height:0;border-top:4px solid transparent;border-bottom:4px solid transparent;border-left:5px solid #95ec69}
+body.theme-wechat .msg-meta{font-size:10px;color:#b2b2b2;margin-top:4px;padding:0 2px;justify-content:center}
+body.theme-wechat .msg-row.sent .msg-meta{justify-content:center}
+body.theme-wechat .msg-read-text{color:#6b8e23}
+
+/* QQ主题 */
+body.theme-qq .msg-row.recv .msg-bubble{background:#fff !important;color:#222 !important;border-radius:18px !important;border:1px solid #e0e0e0 !important;}
+body.theme-qq .msg-row.sent .msg-bubble{background:#4a90d9 !important;color:#fff !important;border-radius:18px !important;}
+
+/* 粉嫩气泡主题 */
+body.theme-pink .msg-row.recv .msg-bubble{background:#fff5f7 !important;color:#d64a6a !important;border:1px solid #ffd1dc !important;border-radius:20px !important;}
+body.theme-pink .msg-row.sent .msg-bubble{background:linear-gradient(135deg,#ffb6c1,#ff8da1) !important;color:#fff !important;border-radius:20px !important;}
+
+/* 简约主题 */
+body.theme-simple .msg-row.recv .msg-bubble{background:#fff !important;color:#222 !important;border:1px solid #e8e8e8 !important;border-radius:4px !important;}
+body.theme-simple .msg-row.sent .msg-bubble{background:#222 !important;color:#fff !important;border-radius:4px !important;}
+</style>
+</head>
+<body>
+<div id="app">
+    <header class="app-header" id="appHeader">
+        <div class="nav-back" id="navBack" onclick="goHome()"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg> 返回</div>
+        <div class="app-header-title" id="appHeaderTitle">Love House</div>
+        <div style="width:20px;"></div>
+    </header>
+    <main class="app-main" id="appMain">
+        <!-- 主页 -->
+        <div class="page active" id="pageHome">
+            <div class="home-container" id="homeBgContainer" style="background-size:cover;background-position:center;">
+                <div class="couple-card" onclick="editCoupleInfo()">
+                    <div class="paw-decor paw-1">🐾</div><div class="paw-decor paw-2">🐾</div><div class="paw-decor paw-3">🐾</div><div class="paw-decor paw-4">🐾</div>
+                    <div class="couple-person"><div class="couple-avatar" id="partnerAvatarBox"></div><div class="couple-name" id="partnerNameTxt"></div></div>
+                    <svg class="couple-heart-icon" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                    <div class="couple-person"><div class="couple-avatar" id="myAvatarBox"></div><div class="couple-name" id="myNameTxt"></div></div>
+                </div>
+                <div class="time-card">
+                    <div class="time-display" id="clockTime">12:03</div>
+                    <div class="date-display" id="clockDate">星期一 · 11月9日</div>
+                    <div style="font-size:11px;color:#ff8da1;margin-top:5px;" id="daysTogetherTxt"></div>
+                    <div class="days-edit-btn" onclick="editStartDate()">设置日期</div>
+                </div>
+                <div class="desktop-grid">
+                    <div class="app-icon" onclick="goPage('messages')"><div class="icon-box"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span class="app-badge" id="msgBadge" style="display:none;">0</span></div><span class="app-name">聊天</span></div>
+                    <div class="app-icon" onclick="goDiaryPage()"><div class="icon-box"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div><span class="app-name">心情日记</span></div>
+                    <div class="app-icon" onclick="goMailboxPage()"><div class="icon-box"><svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg><span class="app-badge" id="mailBadge" style="display:none;">0</span></div><span class="app-name">信箱</span></div>
+                    <div class="app-icon" onclick="goMomentsPage()"><div class="icon-box"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></div><span class="app-name">朋友圈</span></div>
+                    <div class="app-icon" onclick="openGamePage()"><div class="icon-box"><svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="8" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="16" cy="12" r="1.5" fill="currentColor" stroke="none"/><line x1="5" y1="9" x2="5" y2="15"/><line x1="2" y1="12" x2="8" y2="12"/><line x1="19" y1="9" x2="19" y2="15"/><line x1="16" y1="12" x2="22" y2="12"/></svg></div><span class="app-name">一起玩</span></div>
+                    <div class="app-icon" onclick="openStorePage()"><div class="icon-box"><svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></div><span class="app-name">美化商城</span></div>
+                    <div class="app-icon" onclick="openDivinePage()"><div class="icon-box"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18"/><circle cx="12" cy="12" r="3"/></svg></div><span class="app-name">占卜</span></div>
+                    <div class="app-icon" onclick="goPage('settings')"><div class="icon-box"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div><span class="app-name">设置</span></div>
+                </div>
+                <div class="bottom-toolbar">
+                    <div class="tool-btn" onclick="goPage('settings')"><svg viewBox="0 0 24 24"><line x1="21" y1="10" x2="3" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="21" y1="18" x2="3" y2="18"/></svg></div>
+                    <div class="tool-btn" onclick="goPage('beautify')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 聊天列表 -->
+        <div class="page" id="pageMessages"><div class="list-container" id="chatListContainer"></div></div>
+
+        <!-- 设置 -->
+        <div class="page" id="pageSettings">
+            <div class="card-box"><h4><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>公共字卡库</h4><div class="row" onclick="showPublicCardLibModal()"><span>管理字卡与分组</span><span class="val">文本·表情包·emoji</span></div></div>
+            <div class="card-box"><h4><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>聊天设置</h4>
+                <div class="slider-row"><span style="font-size:12px;white-space:nowrap;">回复延时(秒) 最小</span><input type="range" min="1" max="300" id="replyMin" value="3" oninput="appData.settings.replyDelayMin=+this.value;document.getElementById('replyMinVal').textContent=this.value+'s';saveData();"><span class="slider-val" id="replyMinVal">3s</span></div>
+                <div class="slider-row"><span style="font-size:12px;white-space:nowrap;">回复延时(秒) 最大</span><input type="range" min="1" max="300" id="replyMax" value="8" oninput="appData.settings.replyDelayMax=+this.value;document.getElementById('replyMaxVal').textContent=this.value+'s';saveData();"><span class="slider-val" id="replyMaxVal">8s</span></div>
+                <div class="slider-row"><span style="font-size:12px;white-space:nowrap;">对方每次回复条数 最小</span><input type="range" min="1" max="10" id="replyCountMin" value="1" oninput="appData.settings.replyCountMin=+this.value;document.getElementById('replyCountMinVal').textContent=this.value+'条';saveData();"><span class="slider-val" id="replyCountMinVal">1条</span></div>
+                <div class="slider-row"><span style="font-size:12px;white-space:nowrap;">对方每次回复条数 最大</span><input type="range" min="1" max="10" id="replyCountMax" value="3" oninput="appData.settings.replyCountMax=+this.value;document.getElementById('replyCountMaxVal').textContent=this.value+'条';saveData();"><span class="slider-val" id="replyCountMaxVal">3条</span></div>
+            </div>
+            <div class="card-box"><h4><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18"/></svg>神秘学卡片设置</h4>
+                <div class="row"><span>允许对方发送塔罗牌/雷诺曼</span><div class="toggle on" id="divineSendToggle" onclick="toggleDivineSend()"></div></div>
+                <div class="slider-row"><span style="font-size:12px;white-space:nowrap;">发送概率</span><input type="range" min="0" max="100" id="divineProb" value="20" oninput="appData.settings.divineSendProbability=+this.value;document.getElementById('divineProbVal').textContent=this.value+'%';saveData();"><span class="slider-val" id="divineProbVal">20%</span></div>
+            </div>
+            <div class="card-box"><h4><svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>信箱设置</h4>
+                <div class="slider-row"><span style="font-size:12px;white-space:nowrap;">对方写信间隔(小时) 最小</span><input type="range" min="1" max="120" id="letterWriteMin" value="10" oninput="appData.settings.letterWriteMin=+this.value;document.getElementById('letterWriteMinVal').textContent=this.value+'小时';saveData();"><span class="slider-val" id="letterWriteMinVal">10小时</span></div>
+                <div class="slider-row"><span style="font-size:12px;white-space:nowrap;">对方写信间隔(小时) 最大</span><input type="range" min="1" max="120" id="letterWriteMax" value="30" oninput="appData.settings.letterWriteMax=+this.value;document.getElementById('letterWriteMaxVal').textContent=this.value+'小时';saveData();"><span class="slider-val" id="letterWriteMaxVal">30小时</span></div>
+                <div class="slider-row"><span style="font-size:12px;white-space:nowrap;">对方回信间隔(小时) 最小</span><input type="range" min="1" max="120" id="letterReplyMin" value="5" oninput="appData.settings.letterReplyMin=+this.value;document.getElementById('letterReplyMinVal').textContent=this.value+'小时';saveData();"><span class="slider-val" id="letterReplyMinVal">5小时</span></div>
+                <div class="slider-row"><span style="font-size:12px;white-space:nowrap;">对方回信间隔(小时) 最大</span><input type="range" min="1" max="120" id="letterReplyMax" value="15" oninput="appData.settings.letterReplyMax=+this.value;document.getElementById('letterReplyMaxVal').textContent=this.value+'小时';saveData();"><span class="slider-val" id="letterReplyMaxVal">15小时</span></div>
+            </div>
+            <div class="card-box"><h4><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>朋友圈互动设置</h4>
+                <div class="row"><span>开启自动发朋友圈</span><div class="toggle on" onclick="this.classList.toggle('on');appData.settings.momentsAutoPost=this.classList.contains('on');saveData();"></div></div>
+                <div class="slider-row"><span style="font-size:12px;white-space:nowrap;">对方发动态频率(分) 最小</span><input type="range" min="1" max="120" id="momentPostMin" value="5" oninput="appData.settings.momentPostMin=+this.value;document.getElementById('momentPostMinVal').textContent=this.value+'分';saveData();"><span class="slider-val" id="momentPostMinVal">5分</span></div>
+                <div class="slider-row"><span style="font-size:12px;white-space:nowrap;">对方发动态频率(分) 最大</span><input type="range" min="1" max="120" id="momentPostMax" value="15" oninput="appData.settings.momentPostMax=+this.value;document.getElementById('momentPostMaxVal').textContent=this.value+'分';saveData();"><span class="slider-val" id="momentPostMaxVal">15分</span></div>
+                <div class="slider-row"><span style="font-size:12px;white-space:nowrap;">评论你的动态延时(分)</span><input type="range" min="1" max="60" id="momentCommentDelay" value="2" oninput="appData.settings.momentCommentDelay=+this.value;document.getElementById('momentCommentDelayVal').textContent=this.value+'分';saveData();"><span class="slider-val" id="momentCommentDelayVal">2分</span></div>
+                <div class="slider-row"><span style="font-size:12px;white-space:nowrap;">回复你评论延时(分)</span><input type="range" min="1" max="60" id="momentReplyDelay" value="1" oninput="appData.settings.momentReplyDelay=+this.value;document.getElementById('momentReplyDelayVal').textContent=this.value+'分';saveData();"><span class="slider-val" id="momentReplyDelayVal">1分</span></div>
+            </div>
+            <div class="card-box"><h4><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>引用回复设置</h4>
+                <div class="slider-row"><span style="font-size:12px;white-space:nowrap;">对方引用我的消息概率</span><input type="range" min="0" max="100" id="quoteProb" value="30" oninput="appData.settings.quoteProbability=+this.value;document.getElementById('quoteProbVal').textContent=this.value+'%';saveData();"><span class="slider-val" id="quoteProbVal">30%</span></div>
+            </div>
+            <div class="card-box"><h4><svg viewBox="0 0 24 24"><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7"/><polyline points="16 2 22 2 22 8"/><line x1="22" y1="2" x2="12" y2="12"/></svg>全量备份</h4>
+                <div class="row" style="cursor:pointer;" onclick="exportFullBackup()"><span>导出所有数据 (JSON)</span><span class="val">含聊天/朋友圈/日记等</span></div>
+                <div class="row" style="cursor:pointer;" onclick="importFullBackup()"><span>导入全量备份</span><span class="val">覆盖当前数据</span></div>
+            </div>
+            <div class="card-box"><h4><svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>存储</h4><div class="row" style="color:#ff4757;cursor:pointer;" onclick="clearAllData()"><span>清除所有数据</span></div></div>
+        </div>
+        <!-- 美化 -->
+        <div class="page" id="pageBeautify">
+            <div class="card-box"><h4><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/></svg>聊天壁纸</h4><div class="wallpaper-preview" id="wallpaperPreview" style="background-size:cover;"></div><div class="action-row"><button class="btn-sm btn-pri" onclick="uploadWallpaper()">上传壁纸</button><button class="btn-sm btn-out" onclick="removeWallpaper()">移除</button></div></div>
+            <div class="card-box"><h4><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/></svg>主页背景</h4><div class="wallpaper-preview" id="homeBgPreview" style="background-size:cover;"></div><div class="action-row"><button class="btn-sm btn-pri" onclick="uploadHomeBg()">上传背景</button><button class="btn-sm btn-out" onclick="removeHomeBg()">移除</button></div></div>
+            <div class="card-box"><h4><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>全局气泡美化 (CSS)</h4>
+                <textarea class="css-editor" id="globalCssEditor" placeholder="输入全局气泡 CSS..." oninput="updatePreview()"></textarea>
+                <div class="action-row"><button class="btn-sm btn-pri" onclick="applyGlobalCss()">应用</button><button class="btn-sm btn-out" onclick="importCss('globalCssEditor')">导入</button><button class="btn-sm btn-out" onclick="copyCss('globalCssEditor')">复制</button></div>
+                <div style="margin-top:14px;"><div style="font-size:12px;color:#666;margin-bottom:7px;">实时预览：</div><div class="preview-box" id="previewBox" style="padding:14px;background:rgba(255,255,255,.5);border-radius:11px;border:1px solid rgba(255,255,255,.6);display:flex;flex-direction:column;gap:10px;"><style id="previewStyle"></style><div class="preview-msg recv" style="display:flex;gap:7px;align-self:flex-start;"><div class="msg-avatar" style="width:28px;height:28px;font-size:11px;background:rgba(255,255,255,.7);">对</div><div class="preview-bubble" style="padding:9px 12px;border-radius:14px;font-size:13px;background:#f0f0f0;color:#222;">这是对方的气泡</div></div><div class="preview-msg sent" style="display:flex;gap:7px;align-self:flex-end;flex-direction:row-reverse;"><div class="msg-avatar" style="width:28px;height:28px;font-size:11px;background:var(--primary);color:#fff;">我</div><div class="preview-bubble" style="padding:9px 12px;border-radius:14px;font-size:13px;background:#222;color:#fff;">这是我的气泡</div></div></div></div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- 朋友圈 -->
+<div class="moments-page" id="momentsPage">
+    <div class="moments-cover">
+        <div class="moments-nav"><svg viewBox="0 0 24 24" onclick="closeMoments()"><polyline points="15 18 9 12 15 6"/></svg><div class="moments-nav-title">朋友圈</div><svg viewBox="0 0 24 24" onclick="publishMoment()" style="stroke:#fff;fill:rgba(255,255,255,0.3);"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>
+        <div class="moments-cover-text"><h2>MOMENTS</h2><p>把想说的话，留在这里</p></div>
+        <div class="moments-cover-avatar" id="momentsCoverAvatar"></div>
+    </div>
+    <div class="moments-feed" id="momentsFeed"></div>
+</div>
+<!-- 心情日记 -->
+<div class="diary-page" id="diaryPage">
+    <div class="diary-header"><div class="back-btn" onclick="closeDiaryPage()"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div><div class="title">心情日记</div><div class="diary-month-nav"><button onclick="changeDiaryMonth(-1)">‹</button><span class="diary-month-label" id="diaryMonthLabel"></span><button onclick="changeDiaryMonth(1)">›</button></div></div>
+    <div class="diary-content" id="diaryContent"></div>
+</div>
+<!-- 信箱 -->
+<div class="mailbox-page" id="mailboxPage">
+    <div class="mailbox-header"><div class="back-btn" onclick="closeMailboxPage()"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div><div class="title">信箱</div><button class="btn-sm btn-pri" onclick="openLetterEditor()" style="padding:7px 14px;">写信</button></div>
+    <div class="mailbox-content" id="mailboxContent"><div style="text-align:center;padding:50px 18px;color:#999;">还没有信件，点右上角写一封吧</div></div>
+</div>
+<!-- 游戏 -->
+<div class="game-page" id="gamePage"><div class="game-header"><div class="back-btn" onclick="closeGamePage()"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div><div class="title">一起玩游戏</div></div><div class="game-content" id="gameContent"></div></div>
+<!-- 占卜 -->
+<div class="divine-page" id="divinePage">
+    <div class="divine-header"><div class="back-btn" onclick="closeDivinePage()"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div><div class="title">塔罗占卜</div></div>
+    <div class="divine-content" id="divineContent">
+        <div class="divine-intro"><span class="moon-icon">🌙</span><h2>星辰低语</h2><p>静下心来，默念你的问题<br>让三张塔罗牌为你指引方向</p></div>
+        <div class="divine-question-box"><label>你的问题（可选）</label><input id="divineQuestionInput" placeholder="例如：我们的关系会如何发展？"></div>
+        <button class="divine-draw-btn" id="divineDrawBtn" onclick="drawTarot()">抽 三 张 牌</button>
+        <div class="divine-cards" id="divineCards"></div>
+        <div id="divineResultText"></div>
+    </div>
+</div>
+<!-- 商城 -->
+<div class="store-page" id="storePage"><div class="store-header"><div class="back-btn" onclick="closeStorePage()"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div><div class="title">美化商城</div></div><div class="store-content" id="storeContent"></div></div>
+
+<!-- 聊天页面 -->
+<div class="chat-page" id="chatPage">
+    <div class="chat-header">
+        <div class="chat-back-btn" onclick="closeChat()"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div>
+        <div class="chat-header-avatar" id="chatHeaderAvatar"></div>
+        <div class="chat-header-name" id="chatHeaderName">对方 <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+        <div class="chat-header-call" onclick="startCall()">
+            <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        </div>
+    </div>
+    <div class="chat-messages" id="chatMessages"></div>
+    <div class="chat-input-area">
+        <div class="quote-preview-bar" id="quotePreviewBar"><div class="quote-content" id="quotePreviewContent"></div><div class="quote-close" onclick="cancelQuote()">×</div></div>
+        <div class="input-bar"><button class="plus-btn" onclick="togglePlusPanel()"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button><div class="input-wrapper"><input type="text" id="chatInput" placeholder="" onkeydown="if(event.key==='Enter') sendMsg()"><button class="send-circle-btn" onclick="sendMsg()"><svg viewBox="0 0 24 24"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg></button></div></div>
+    </div>
+    <div class="panel" id="plusPanel">
+        <div class="panel-actions">
+            <button class="panel-action-btn" onclick="createQA()"><div class="icon-box"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><span>问问Ta</span></button>
+            <button class="panel-action-btn" onclick="pickImage()"><div class="icon-box"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div><span>图片</span></button>
+            <button class="panel-action-btn" onclick="sendDivineCardToChat()"><div class="icon-box"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18"/><circle cx="12" cy="12" r="3"/></svg></div><span>神秘卡</span></button>
+        </div>
+        <div class="emoji-tabs"><button class="e-tab active" onclick="switchEmojiTab('sticker', this)">表情包</button><button class="e-tab" onclick="switchEmojiTab('emoji', this)">emoji</button><button class="e-tab" onclick="switchEmojiTab('kaomoji', this)">颜文字</button></div>
+        <div class="emoji-grid" id="emojiGrid"></div>
+    </div>
+</div>
+
+<!-- 通话全屏页面（语音通话） -->
+<div class="call-page" id="callPage">
+    <div class="call-top">
+        <div class="call-status"><div class="dot"></div> 连接中</div>
+        <div class="call-top-actions">
+            <button class="call-action-btn" onclick="minimizeCall()"><svg viewBox="0 0 24 24"><polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/><line x1="14" y1="10" x2="21" y2="3"/><line x1="3" y1="21" x2="10" y2="14"/></svg></button>
+            <button class="call-action-btn" onclick="hangupCall()"><svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+        </div>
+    </div>
+    
+    <div class="call-center">
+        <div class="call-avatar-wrap">
+            <div class="call-avatar" id="callAvatar"></div>
+        </div>
+        <div class="call-name" id="callName">亲爱的</div>
+        <div class="call-tip">
+            <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            <span>正在连接</span>
+        </div>
+        <div class="call-pages">
+            <div class="call-page-dot"></div>
+            <div class="call-page-dot active"></div>
+            <div class="call-page-dot"></div>
+        </div>
+    </div>
+
+    <div class="call-bottom">
+        <button class="call-bottom-btn" onclick="toggleMute(this)">
+            <svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/><line x1="3" y1="3" x2="21" y2="21" stroke-linecap="round" stroke-dasharray="2,2" style="display:none;" class="mute-slash"/></svg>
+        </button>
+        <button class="call-bottom-btn hangup" onclick="hangupCall()">
+            <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        </button>
+        <button class="call-bottom-btn" onclick="toggleSpeaker(this)">
+            <svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+        </button>
+    </div>
+</div>
+
+<!-- 通话画中画（长方形悬浮窗 - 语音通话） -->
+<div class="call-mini" id="callMini" onclick="maximizeCall()">
+    <div class="call-mini-avatar" id="callMiniAvatar"></div>
+    <div class="call-mini-info">
+        <div class="call-mini-name" id="callMiniName">亲爱的</div>
+        <div class="call-mini-timer" id="callMiniTimer">00:00</div>
+    </div>
+    <div class="call-mini-dot"></div>
+    <div class="call-mini-close" onclick="event.stopPropagation(); hangupCall()">
+        <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/><line x1="1" y1="1" x2="23" y2="23" stroke-linecap="round" stroke-width="3"/></svg>
+    </div>
+</div>
+
+<input type="file" id="imageInput" accept="image/*" style="display:none;" onchange="handleImageUpload(event)">
+<input type="file" id="wallpaperUploadInput" accept="image/*" style="display:none;">
+<input type="file" id="homeBgUploadInput" accept="image/*" style="display:none;">
+<input type="file" id="cardImageUploadInput" accept="image/*" multiple style="display:none;">
+<input type="file" id="cssFileInput" accept=".css,.txt" style="display:none;">
+<input type="file" id="backupImportInput" accept=".json,application/json" style="display:none;">
+<input type="file" id="cardLibImportInput" accept=".json,application/json" style="display:none;">
+<div class="modal-overlay" id="modalOverlay"><div class="modal-box" id="modalBox"></div></div>
+<div class="toast-notification" id="toastNotification" onclick="openChatFromToast()"><div class="toast-avatar" id="toastAvatar"></div><div class="toast-content"><div class="toast-name" id="toastName"></div><div class="toast-message" id="toastMessage"></div></div><div class="toast-close" onclick="event.stopPropagation(); hideToast()">×</div></div>
+
+<script>
+// ================= 数据与存储 =================
+let db = null;
+const DB_NAME = 'LoveHouseDB_V49';
+const DB_VERSION = 1;
+
+function getDefaultData() {
+    return {
+        myProfile: { name: '我', avatar: null },
+        partner: { name: '亲爱的', avatar: null, startDate: '2023-08-02', customDays: null },
+        chats: [], moments: [], diary: [], letters: [],
+        activeTheme: 'default',
+        customHomeBg: null,
+        settings: {
+            publicCardLib: { groups: [{ id: 'cg1', name: '日常', textCards: ['你好呀','在干嘛','想你了','好棒！','哈哈哈哈哈','呜呜呜'], emojiCards: ['😊','😂'], kaomojiCards: ['(◕‿◕)'], stickerCards: [] }] },
+            globalTheme: { chatWallpaper: null, globalCss: '' },
+            replyDelayMin: 3, replyDelayMax: 8, replyCountMin: 1, replyCountMax: 3,
+            momentsAutoPost: true, momentPostMin: 5, momentPostMax: 15,
+            momentCommentDelay: 2, momentReplyDelay: 1, lastMomentPostTime: Date.now(),
+            quoteProbability: 30,
+            divineSendEnabled: true, divineSendProbability: 20,
+            letterWriteMin: 10, letterWriteMax: 30, letterReplyMin: 5, letterReplyMax: 15,
+            lastLetterTime: 0,
+            gomokuEasyMode: false
+        }
+    };
+}
+let appData = getDefaultData();
+
+function openDB() { return new Promise((resolve, reject) => { const req = indexedDB.open(DB_NAME, DB_VERSION); req.onupgradeneeded = (e) => { const db = e.target.result; if (!db.objectStoreNames.contains('store')) db.createObjectStore('store', { keyPath: 'key' }); }; req.onsuccess = (e) => { db = e.target.result; resolve(db); }; req.onerror = (e) => reject(e.target.error); }); }
+function dbGet(key) { return new Promise((resolve) => { if (!db) return resolve(null); const tx = db.transaction('store', 'readonly'); const req = tx.objectStore('store').get(key); req.onsuccess = () => resolve(req.result ? req.result.value : null); req.onerror = () => resolve(null); }); }
+function dbSet(key, value) { return new Promise((resolve) => { if (!db) return resolve(); const tx = db.transaction('store', 'readwrite'); tx.objectStore('store').put({ key, value }); tx.oncomplete = () => resolve(); tx.onerror = () => resolve(); }); }
+async function saveData() { await dbSet('appData', appData); }
+function deepMerge(target, source) { if (!source) return target; for (const key in source) { if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) { if (!target[key] || typeof target[key] !== 'object') target[key] = {}; deepMerge(target[key], source[key]); } else { target[key] = source[key]; } } return target; }
+async function loadData() { const data = await dbGet('appData'); if (data) { const defaults = getDefaultData(); appData = deepMerge(defaults, data); } }
+
+// ================= 塔罗牌与雷诺曼牌库 =================
+const TAROT_MAJOR = [
+    { id:'tarot_00', name:'愚者', symbol:'0', meaning:'全新开始，冒险，自由，无限可能。' },
+    { id:'tarot_01', name:'魔术师', symbol:'I', meaning:'创造力，资源整合，行动力拉满。' },
+    { id:'tarot_02', name:'女祭司', symbol:'II', meaning:'直觉，智慧，静观其变。' },
+    { id:'tarot_03', name:'皇后', symbol:'III', meaning:'丰收，温柔，孕育，富足。' },
+    { id:'tarot_04', name:'皇帝', symbol:'IV', meaning:'权威，规则，掌控，责任感。' },
+    { id:'tarot_05', name:'教皇', symbol:'V', meaning:'传统，导师，精神指引。' },
+    { id:'tarot_06', name:'恋人', symbol:'VI', meaning:'真爱，合作，重要抉择。' },
+    { id:'tarot_07', name:'战车', symbol:'VII', meaning:'胜利，掌控局势，勇往直前。' },
+    { id:'tarot_08', name:'力量', symbol:'VIII', meaning:'内在勇气，温柔的掌控，耐心。' },
+    { id:'tarot_09', name:'隐士', symbol:'IX', meaning:'独处自省，深度思考，寻求真理。' },
+    { id:'tarot_10', name:'命运之轮', symbol:'X', meaning:'运势转机，好运降临，因果循环。' },
+    { id:'tarot_11', name:'正义', symbol:'XI', meaning:'公平，决断，契约，因果。' },
+    { id:'tarot_12', name:'倒吊人', symbol:'XII', meaning:'换位思考，牺牲，沉淀等待。' },
+    { id:'tarot_13', name:'死神', symbol:'XIII', meaning:'彻底结束，重生，蜕变。' },
+    { id:'tarot_14', name:'节制', symbol:'XIV', meaning:'平衡，调和，循序渐进。' },
+    { id:'tarot_15', name:'恶魔', symbol:'XV', meaning:'束缚，欲望，执念，物质捆绑。' },
+    { id:'tarot_16', name:'高塔', symbol:'XVI', meaning:'突发变故，破碎，真相曝光。' },
+    { id:'tarot_17', name:'星星', symbol:'XVII', meaning:'希望，治愈，梦想，好运预兆。' },
+    { id:'tarot_18', name:'月亮', symbol:'XVIII', meaning:'潜意识，不安，迷雾，直觉预警。' },
+    { id:'tarot_19', name:'太阳', symbol:'XIX', meaning:'成功，快乐，明朗，活力。' },
+    { id:'tarot_20', name:'审判', symbol:'XX', meaning:'觉醒，复盘，宿命召唤。' },
+    { id:'tarot_21', name:'世界', symbol:'XXI', meaning:'圆满完成，终极成功，人生闭环。' }
+];
+const TAROT_SUITS = [
+    { suit:'权杖', symbol:'W', color:'#ffe0c0', meanings:['新机会，热情开端','规划抉择','等待结果，拓展','庆祝，稳定','竞争，冲突','胜利，认可','坚持立场','迅速行动','坚韧，最后一搏','责任，负担','探索，灵感','行动，冒险','勇气，魅力','大局观，领导'] },
+    { suit:'圣杯', symbol:'C', color:'#d8e8ff', meanings:['情感充沛，新感情','联合，伙伴','友谊，快乐','冷漠，自省','失落，悲恸','怀念，重逢','幻象，选择','离开，寻找更深意义','愿望满足','情感圆满，家庭','情感消息，灵感','浪漫，追求','温柔，直觉','情感成熟，掌控'] },
+    { suit:'宝剑', symbol:'S', color:'#e0e0f0', meanings:['清晰，突破','僵局，抉择','心碎，痛苦','休息，恢复','冲突，失败','过渡，离开','策略，隐瞒','束缚，无力感','焦虑，噩梦','结束，谷底','好奇，警觉','冲动，直率','独立，清醒','权威，理性'] },
+    { suit:'星币', symbol:'P', color:'#e8f0d0', meanings:['新财源，新机会','平衡，灵活','合作，初步成果','保守，控制','困境，匮乏','给予，接受','耐心，等待','专注，精进','自足，享受','财富，传承','学习，务实','勤奋，可靠','丰盛，滋养','稳定，成功'] }
+];
+const TAROT_RANKS = ['Ace','2','3','4','5','6','7','8','9','10','侍从','骑士','王后','国王'];
+function buildFullTarotDeck() {
+    const deck = TAROT_MAJOR.map(c => ({ ...c, type:'tarot', image:'cards/tarot/' + c.id + '.jpg', color:'#f0e6d8' }));
+    TAROT_SUITS.forEach(s => { TAROT_RANKS.forEach((rank, i) => { deck.push({ id: `tarot_${s.suit}_${i+1}`, name: `${s.suit}${rank}`, symbol: s.symbol + (i+1), meaning: s.meanings[i], type: 'tarot', color: s.color, image: `cards/tarot/${s.suit}${i+1}.jpg` }); }); });
+    return deck;
+}
+const LENORMAND_DECK = [
+    { id:'len_01', name:'骑士', symbol:'1', meaning:'消息传来，行动迅速。', image:'cards/lenormand/01.jpg' },
+    { id:'len_02', name:'四叶草', symbol:'2', meaning:'小幸运，短暂的好运。', image:'cards/lenormand/02.jpg' },
+    { id:'len_03', name:'船', symbol:'3', meaning:'远行，旅程，探索。', image:'cards/lenormand/03.jpg' },
+    { id:'len_04', name:'房子', symbol:'4', meaning:'家，安全感，稳定。', image:'cards/lenormand/04.jpg' },
+    { id:'len_05', name:'树', symbol:'5', meaning:'成长，健康，根基。', image:'cards/lenormand/05.jpg' },
+    { id:'len_06', name:'云', symbol:'6', meaning:'困惑，模糊，暂时的阴霾。', image:'cards/lenormand/06.jpg' },
+    { id:'len_07', name:'蛇', symbol:'7', meaning:'诱惑，曲折，潜在威胁。', image:'cards/lenormand/07.jpg' },
+    { id:'len_08', name:'棺材', symbol:'8', meaning:'结束，停滞，放下。', image:'cards/lenormand/08.jpg' },
+    { id:'len_09', name:'花束', symbol:'9', meaning:'礼物，惊喜，美好的事。', image:'cards/lenormand/09.jpg' },
+    { id:'len_10', name:'镰刀', symbol:'10', meaning:'斩断，突然的结束。', image:'cards/lenormand/10.jpg' },
+    { id:'len_11', name:'鞭子', symbol:'11', meaning:'争执，重复，磨练。', image:'cards/lenormand/11.jpg' },
+    { id:'len_12', name:'鸟', symbol:'12', meaning:'交谈，消息，短途。', image:'cards/lenormand/12.jpg' },
+    { id:'len_13', name:'孩子', symbol:'13', meaning:'新的开始，纯真，小事物。', image:'cards/lenormand/13.jpg' },
+    { id:'len_14', name:'狐狸', symbol:'14', meaning:'谨慎，策略，警惕。', image:'cards/lenormand/14.jpg' },
+    { id:'len_15', name:'熊', symbol:'15', meaning:'力量，保护，权威。', image:'cards/lenormand/15.jpg' },
+    { id:'len_16', name:'星星', symbol:'16', meaning:'希望，指引，清晰。', image:'cards/lenormand/16.jpg' },
+    { id:'len_17', name:'鹳', symbol:'17', meaning:'变化，迁移，新生。', image:'cards/lenormand/17.jpg' },
+    { id:'len_18', name:'狗', symbol:'18', meaning:'忠诚，友谊，信任。', image:'cards/lenormand/18.jpg' },
+    { id:'len_19', name:'高塔', symbol:'19', meaning:'孤独，权威，保护。', image:'cards/lenormand/19.jpg' },
+    { id:'len_20', name:'花园', symbol:'20', meaning:'社交，公开，相聚。', image:'cards/lenormand/20.jpg' },
+    { id:'len_21', name:'山', symbol:'21', meaning:'障碍，延迟，挑战。', image:'cards/lenormand/21.jpg' },
+    { id:'len_22', name:'十字路口', symbol:'22', meaning:'选择，分岔，决定。', image:'cards/lenormand/22.jpg' },
+    { id:'len_23', name:'老鼠', symbol:'23', meaning:'消耗，担忧，小烦恼。', image:'cards/lenormand/23.jpg' },
+    { id:'len_24', name:'心', symbol:'24', meaning:'爱情，热情，感情。', image:'cards/lenormand/24.jpg' },
+    { id:'len_25', name:'戒指', symbol:'25', meaning:'承诺，约定，结合。', image:'cards/lenormand/25.jpg' },
+    { id:'len_26', name:'书', symbol:'26', meaning:'知识，秘密，学习。', image:'cards/lenormand/26.jpg' },
+    { id:'len_27', name:'信', symbol:'27', meaning:'消息，沟通，文件。', image:'cards/lenormand/27.jpg' },
+    { id:'len_28', name:'男人', symbol:'28', meaning:'男性人物，理性。', image:'cards/lenormand/28.jpg' },
+    { id:'len_29', name:'女人', symbol:'29', meaning:'女性人物，感性。', image:'cards/lenormand/29.jpg' },
+    { id:'len_30', name:'百合', symbol:'30', meaning:'平静，成熟，家庭。', image:'cards/lenormand/30.jpg' },
+    { id:'len_31', name:'太阳', symbol:'31', meaning:'成功，温暖，光明。', image:'cards/lenormand/31.jpg' },
+    { id:'len_32', name:'月亮', symbol:'32', meaning:'情感，直觉，浪漫。', image:'cards/lenormand/32.jpg' },
+    { id:'len_33', name:'钥匙', symbol:'33', meaning:'解决，开启，答案。', image:'cards/lenormand/33.jpg' },
+    { id:'len_34', name:'鱼', symbol:'34', meaning:'丰盛，财富，流动。', image:'cards/lenormand/34.jpg' },
+    { id:'len_35', name:'锚', symbol:'35', meaning:'稳定，坚持，安全。', image:'cards/lenormand/35.jpg' },
+    { id:'len_36', name:'十字架', symbol:'36', meaning:'考验，信仰，负担。', image:'cards/lenormand/36.jpg' }
+];
+const FULL_TAROT_DECK = buildFullTarotDeck();
+function randomDivineCard() {
+    if (Math.random() < 0.5) { const c = FULL_TAROT_DECK[Math.floor(Math.random() * FULL_TAROT_DECK.length)]; return { type: 'tarot', ...c }; }
+    else { const c = LENORMAND_DECK[Math.floor(Math.random() * LENORMAND_DECK.length)]; return { type: 'lenormand', ...c, color:'#e0e8f0' }; }
+}
+
+// ================= 语音通话功能 =================
+let callDurationTimer = null;
+let callSeconds = 0;
+let callSpeakerOn = false;
+
+function startCall() {
+    if (!currentChatId) return;
+    const chat = appData.chats.find(c => c.id === currentChatId);
+    if (!chat) return;
+    
+    document.getElementById('callName').textContent = chat.name;
+    const avatarHtml = chat.avatar ? `<img src="${chat.avatar}">` : chat.name.charAt(0);
+    document.getElementById('callAvatar').innerHTML = avatarHtml;
+    document.getElementById('callMiniAvatar').innerHTML = avatarHtml;
+    document.getElementById('callMiniName').textContent = chat.name;
+    
+    callSeconds = 0;
+    callSpeakerOn = false;
+    clearInterval(callDurationTimer);
+    document.querySelector('#callPage .call-tip span').textContent = '正在连接';
+    document.querySelector('#callPage .call-status').innerHTML = '<div class="dot"></div> 连接中';
+    document.getElementById('callMiniTimer').textContent = '连接中...';
+    document.querySelector('.call-bottom-btn:last-child').style.background = 'rgba(255,255,255,0.1)';
+    
+    document.getElementById('callPage').classList.add('active');
+    document.getElementById('callMini').classList.remove('active');
+    
+    setTimeout(() => {
+        if (!document.getElementById('callPage').classList.contains('active') && !document.getElementById('callMini').classList.contains('active')) return;
+        document.querySelector('#callPage .call-tip span').textContent = '00:00';
+        document.querySelector('#callPage .call-status').innerHTML = '<div class="dot"></div> 通话中';
+        
+        callDurationTimer = setInterval(() => {
+            callSeconds++;
+            const m = String(Math.floor(callSeconds / 60)).padStart(2, '0');
+            const s = String(callSeconds % 60).padStart(2, '0');
+            document.querySelector('#callPage .call-tip span').textContent = `${m}:${s}`;
+            document.getElementById('callMiniTimer').textContent = `${m}:${s}`;
+        }, 1000);
+    }, 2000);
+}
+
+function minimizeCall() {
+    document.getElementById('callPage').classList.remove('active');
+    document.getElementById('callMini').classList.add('active');
+    initCallMiniDrag();
+}
+
+function maximizeCall() {
+    document.getElementById('callMini').classList.remove('active');
+    document.getElementById('callPage').classList.add('active');
+}
+
+function hangupCall() {
+    clearInterval(callDurationTimer);
+    document.getElementById('callPage').classList.remove('active');
+    document.getElementById('callMini').classList.remove('active');
+    
+    if (currentChatId) {
+        const chat = appData.chats.find(c => c.id === currentChatId);
+        if (chat) {
+            const m = String(Math.floor(callSeconds / 60)).padStart(2, '0');
+            const s = String(callSeconds % 60).padStart(2, '0');
+            const duration = `${m}:${s}`;
+            
+            const newMsg = { 
+                id: 'm' + Date.now(), 
+                sender: 'me', 
+                type: 'call_record', 
+                text: `通话时长 ${duration}`, 
+                time: Date.now(), 
+                read: false,
+                callData: { duration, type: 'voice' }
+            };
+            chat.messages.push(newMsg);
+            chat.lastMsg = `[语音通话] 通话时长 ${duration}`;
+            if (isChatVisible(chat.id)) renderMessages(chat, true);
+            saveData();
+        }
+    }
+}
+
+function toggleMute(btn) {
+    const slash = btn.querySelector('.mute-slash');
+    if (slash.style.display === 'none' || !slash.style.display) {
+        slash.style.display = 'block';
+        btn.style.background = 'rgba(255,255,255,0.3)';
+    } else {
+        slash.style.display = 'none';
+        btn.style.background = 'rgba(255,255,255,0.1)';
+    }
+}
+
+function toggleSpeaker(btn) {
+    callSpeakerOn = !callSpeakerOn;
+    btn.style.background = callSpeakerOn ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.1)';
+}
+
+function initCallMiniDrag() {
+    const player = document.getElementById('callMini');
+    if (!player || player.dataset.dragInit) return;
+    player.dataset.dragInit = 'true';
+    
+    let startX = 0, startY = 0, startLeft = 0, startTop = 0, isDragging = false;
+    
+    const onStart = (e) => {
+        if (e.target.closest('.call-mini-close')) return;
+        const touch = e.touches ? e.touches[0] : e;
+        startX = touch.clientX; startY = touch.clientY;
+        const rect = player.getBoundingClientRect();
+        startLeft = rect.left; startTop = rect.top;
+        player.style.transition = 'none';
+        player.style.left = startLeft + 'px'; player.style.top = startTop + 'px'; player.style.right = 'auto';
+        isDragging = true;
+        player.classList.add('dragging');
+    };
+    
+    const onMove = (e) => {
+        if (!isDragging) return;
+        const touch = e.touches ? e.touches[0] : e;
+        const dx = touch.clientX - startX, dy = touch.clientY - startY;
+        let newLeft = startLeft + dx, newTop = startTop + dy;
+        
+        const maxLeft = window.innerWidth - player.offsetWidth;
+        const maxTop = window.innerHeight - player.offsetHeight;
+        newLeft = Math.max(0, Math.min(newLeft, maxLeft));
+        newTop = Math.max(0, Math.min(newTop, maxTop));
+        
+        player.style.left = newLeft + 'px'; player.style.top = newTop + 'px';
+        if (e.cancelable) e.preventDefault();
+    };
+    
+    const onEnd = () => {
+        if (!isDragging) return;
+        isDragging = false;
+        player.classList.remove('dragging');
+    };
+    
+    player.addEventListener('mousedown', onStart); player.addEventListener('touchstart', onStart, { passive: false });
+    document.addEventListener('mousemove', onMove); document.addEventListener('touchmove', onMove, { passive: false });
+    document.addEventListener('mouseup', onEnd); document.addEventListener('touchend', onEnd);
+}
+
+// ================= 基础逻辑 =================
+function updateClock() {
+    const now = new Date();
+    document.getElementById('clockTime').textContent = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    const weeks = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+    document.getElementById('clockDate').textContent = `${weeks[now.getDay()]} · ${now.getMonth()+1}月${now.getDate()}日`;
+    
+    if (appData.partner && appData.partner.startDate) {
+        // 解析设置的日期，计算天数
+        const start = new Date(appData.partner.startDate);
+        start.setHours(0, 0, 0, 0);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const diffTime = Math.abs(today - start);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // 当天也算一天
+        document.getElementById('daysTogetherTxt').textContent = `相爱 ${diffDays} 天`;
+    }
+}
+setInterval(updateClock, 1000);
+
+function renderHomeAvatars() {
+    document.getElementById('partnerNameTxt').textContent = appData.partner.name;
+    document.getElementById('myNameTxt').textContent = appData.myProfile.name;
+    document.getElementById('partnerAvatarBox').innerHTML = appData.partner.avatar ? `<img src="${appData.partner.avatar}">` : appData.partner.name.charAt(0);
+    document.getElementById('myAvatarBox').innerHTML = appData.myProfile.avatar ? `<img src="${appData.myProfile.avatar}">` : appData.myProfile.name.charAt(0);
+    document.getElementById('momentsCoverAvatar').innerHTML = appData.myProfile.avatar ? `<img src="${appData.myProfile.avatar}">` : appData.myProfile.name.charAt(0);
+}
+
+function updateBadge() {
+    const total = appData.chats.reduce((sum, c) => sum + (c.unread || 0), 0);
+    const badge = document.getElementById('msgBadge');
+    if (badge) { badge.style.display = total > 0 ? 'flex' : 'none'; if (total > 0) badge.textContent = total > 99 ? '99+' : total; }
+    const unreadLetters = appData.letters.filter(l => l.from === 'partner' && !l.read).length;
+    const mailBadge = document.getElementById('mailBadge');
+    if (mailBadge) { mailBadge.style.display = unreadLetters > 0 ? 'flex' : 'none'; if (unreadLetters > 0) mailBadge.textContent = unreadLetters > 99 ? '99+' : unreadLetters; }
+}
+
+function goPage(pageId) {
+    closeChat(); closeMoments(); closeDiaryPage(); closeMailboxPage(); closeGamePage(); closeStorePage(); closeDivinePage();
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('page' + pageId.charAt(0).toUpperCase() + pageId.slice(1)).classList.add('active');
+    const backBtn = document.getElementById('navBack'), title = document.getElementById('appHeaderTitle');
+    if (pageId === 'home') { backBtn.style.display = 'none'; title.textContent = 'Love House'; }
+    else { backBtn.style.display = 'flex'; title.textContent = { messages: '聊天', settings: '设置', beautify: '美化' }[pageId]; }
+    if (pageId === 'messages') renderChatList();
+    if (pageId === 'beautify') renderBeautify();
+    if (pageId === 'settings') renderSettings();
+}
+function goHome() { goPage('home'); updateClock(); }
+
+// ================= 设置日期 =================
+function editStartDate() { 
+    showModal(`<h3>设置相爱日期</h3>
+    <div class="form-group"><label>我们在一起的日期</label><input type="date" id="startDateInput" value="${appData.partner.startDate}"></div>
+    <div class="m-actions"><button class="m-cancel" onclick="closeModal()">取消</button><button class="m-confirm" onclick="saveStartDate()">保存</button></div>`); 
+}
+function saveStartDate() { 
+    const val = document.getElementById('startDateInput').value;
+    if (val) {
+        appData.partner.startDate = val;
+        saveData(); closeModal(); updateClock();
+    }
+}
+
+// ================= 回复文本 =================
+function getPartnerReplyText() {
+    const groups = appData.settings.publicCardLib.groups;
+    let allTexts = [];
+    groups.forEach(g => { if (g.textCards) allTexts = allTexts.concat(g.textCards); if (g.emojiCards) allTexts = allTexts.concat(g.emojiCards); if (g.kaomojiCards) allTexts = allTexts.concat(g.kaomojiCards); });
+    if (allTexts.length === 0) return '嗯嗯';
+    return allTexts[Math.floor(Math.random() * allTexts.length)];
+}
+function generateLetterFromCards() {
+    const groups = appData.settings.publicCardLib.groups;
+    let allCards = [];
+    groups.forEach(g => { if (g.textCards) allCards = allCards.concat(g.textCards); if (g.emojiCards) allCards = allCards.concat(g.emojiCards); if (g.kaomojiCards) allCards = allCards.concat(g.kaomojiCards); });
+    if (allCards.length === 0) return '今天想你了。';
+    const count = 2 + Math.floor(Math.random() * 5);
+    const picked = [];
+    for (let i = 0; i < count; i++) picked.push(allCards[Math.floor(Math.random() * allCards.length)]);
+    return picked.join('，');
+}
+
+// ================= 游戏 =================
+function openGamePage() { goPage('home'); closeDivinePage(); closeStorePage(); document.getElementById('gamePage').classList.add('active'); renderGameSelect(); }
+function closeGamePage() { document.getElementById('gamePage').classList.remove('active'); }
+function renderGameSelect() {
+    document.getElementById('gameContent').innerHTML = `
+        <div class="game-select-card" onclick="openGomoku()"><div class="game-select-icon" style="background:linear-gradient(135deg,#e8d5b7,#c9a87c);font-size:24px;">五</div><div class="game-select-info"><h3>五子棋</h3><p>轮流落子，先连五子者胜</p></div></div>
+        <div class="game-select-card" onclick="openRPS()"><div class="game-select-icon" style="background:linear-gradient(135deg,#ffd6e0,#ffb6c1);font-size:24px;">拳</div><div class="game-select-info"><h3>猜拳</h3><p>石头剪刀布，看谁赢</p></div></div>`;
+}
+function openGomoku() { renderGomoku(); }
+function openRPS() { renderRPS(); }
+let gomokuBoard = [], gomokuTurn = 'black', gomokuGameOver = false, gomokuLastMove = null;
+function renderGomoku() {
+    gomokuBoard = Array(15).fill(null).map(() => Array(15).fill(null)); gomokuTurn = 'black'; gomokuGameOver = false; gomokuLastMove = null;
+    document.getElementById('gameContent').innerHTML = `
+        <div class="gomoku-status" id="gomokuStatus"></div>
+        <div class="gomoku-board" id="gomokuBoard"></div>
+        <div class="gomoku-options">
+            <div style="display:flex;align-items:center;gap:7px;background:rgba(255,255,255,0.5);padding:5px 12px;border-radius:11px;font-size:12px;"><span>对方放水</span><div class="toggle ${appData.settings.gomokuEasyMode ? 'on' : ''}" id="gomokuEasyToggle" onclick="toggleGomokuEasy()"></div></div>
+            <button class="btn-sm btn-pri" onclick="renderGomoku()">重新开始</button>
+            <button class="btn-sm btn-out" onclick="renderGameSelect()">返回</button>
+        </div>`;
+    drawGomokuBoard(); updateGomokuStatus();
+}
+function toggleGomokuEasy() { appData.settings.gomokuEasyMode = !appData.settings.gomokuEasyMode; saveData(); const el = document.getElementById('gomokuEasyToggle'); if (el) el.classList.toggle('on', appData.settings.gomokuEasyMode); }
+function drawGomokuBoard() {
+    const boardEl = document.getElementById('gomokuBoard'); let html = '';
+    for (let r = 0; r < 15; r++) for (let c = 0; c < 15; c++) {
+        const cell = gomokuBoard[r][c]; let stoneHtml = '';
+        if (cell) { const isLast = gomokuLastMove && gomokuLastMove.r === r && gomokuLastMove.c === c; stoneHtml = `<div class="stone ${cell} ${isLast ? 'last-move' : ''}"></div>`; }
+        html += `<div class="gomoku-cell" onclick="gomokuPlace(${r},${c})">${stoneHtml}</div>`;
+    }
+    boardEl.innerHTML = html;
+}
+function updateGomokuStatus() { const el = document.getElementById('gomokuStatus'); if (!el || gomokuGameOver) return; el.innerHTML = `<span class="turn-dot ${gomokuTurn}"></span> 轮到 ${gomokuTurn === 'black' ? '我方（黑子）' : '对方（白子）'} 落子`; }
+function gomokuPlace(r, c) {
+    if (gomokuGameOver || gomokuBoard[r][c] || gomokuTurn !== 'black') return;
+    gomokuBoard[r][c] = 'black'; gomokuLastMove = { r, c }; drawGomokuBoard();
+    if (checkGomokuWin(r, c, 'black')) { gomokuGameOver = true; document.getElementById('gomokuStatus').innerHTML = '你赢了！'; return; }
+    if (gomokuBoard.flat().every(cell => cell)) { gomokuGameOver = true; document.getElementById('gomokuStatus').innerHTML = '平局！'; return; }
+    gomokuTurn = 'white'; updateGomokuStatus();
+    setTimeout(() => {
+        if (gomokuGameOver) return;
+        const move = findGomokuAIMove();
+        if (move) {
+            gomokuBoard[move.r][move.c] = 'white'; gomokuLastMove = { r: move.r, c: move.c }; drawGomokuBoard();
+            if (checkGomokuWin(move.r, move.c, 'white')) { gomokuGameOver = true; document.getElementById('gomokuStatus').innerHTML = '对方赢了'; return; }
+            if (gomokuBoard.flat().every(cell => cell)) { gomokuGameOver = true; document.getElementById('gomokuStatus').innerHTML = '平局！'; return; }
+        }
+        gomokuTurn = 'black'; updateGomokuStatus();
+    }, 500);
+}
+function checkGomokuWin(r, c, color) {
+    const dirs = [[0,1],[1,0],[1,1],[1,-1]];
+    for (const [dr, dc] of dirs) {
+        let count = 1;
+        for (let i = 1; i < 5; i++) { const nr = r + dr * i, nc = c + dc * i; if (nr < 0 || nr >= 15 || nc < 0 || nc >= 15) break; if (gomokuBoard[nr][nc] === color) count++; else break; }
+        for (let i = 1; i < 5; i++) { const nr = r - dr * i, nc = c - dc * i; if (nr < 0 || nr >= 15 || nc < 0 || nc >= 15) break; if (gomokuBoard[nr][nc] === color) count++; else break; }
+        if (count >= 5) return true;
+    }
+    return false;
+}
+function findGomokuAIMove() {
+    const empties = [];
+    for (let r = 0; r < 15; r++) for (let c = 0; c < 15; c++) if (!gomokuBoard[r][c]) empties.push({r, c});
+    if (empties.length === 0) return null;
+    if (appData.settings.gomokuEasyMode) {
+        for (const e of empties) { gomokuBoard[e.r][e.c] = 'black'; if (checkGomokuWin(e.r, e.c, 'black')) { gomokuBoard[e.r][e.c] = null; return e; } gomokuBoard[e.r][e.c] = null; }
+        let best = empties[0], bestScore = -1;
+        for (const e of empties) { let score = Math.random(); if (score > bestScore) { bestScore = score; best = e; } }
+        return best;
+    }
+    for (const e of empties) { gomokuBoard[e.r][e.c] = 'white'; if (checkGomokuWin(e.r, e.c, 'white')) { gomokuBoard[e.r][e.c] = null; return e; } gomokuBoard[e.r][e.c] = null; }
+    for (const e of empties) { gomokuBoard[e.r][e.c] = 'black'; if (checkGomokuWin(e.r, e.c, 'black')) { gomokuBoard[e.r][e.c] = null; return e; } gomokuBoard[e.r][e.c] = null; }
+    let best = empties[0], bestScore = -1;
+    for (const e of empties) { let score = 0; for (let dr = -2; dr <= 2; dr++) for (let dc = -2; dc <= 2; dc++) { const nr = e.r + dr, nc = e.c + dc; if (nr >= 0 && nr < 15 && nc >= 0 && nc < 15 && gomokuBoard[nr][nc]) score += 2; } score += Math.random(); if (score > bestScore) { bestScore = score; best = e; } }
+    return best;
+}
+let rpsMyScore = 0, rpsPartnerScore = 0;
+function renderRPS() {
+    rpsMyScore = 0; rpsPartnerScore = 0;
+    document.getElementById('gameContent').innerHTML = `
+        <div style="text-align:center;margin-bottom:7px;"><div style="font-size:13px;color:#666;" id="rpsScore">我方 0 : 0 对方</div></div>
+        <div class="rps-result" id="rpsResult"><div class="big-emoji">选择你的出拳</div></div>
+        <div class="rps-choices"><div class="rps-choice" onclick="rpsPick('rock')">石头</div><div class="rps-choice" onclick="rpsPick('scissors')">剪刀</div><div class="rps-choice" onclick="rpsPick('paper')">布</div></div>
+        <div style="display:flex;gap:7px;justify-content:center;margin-top:14px;"><button class="btn-sm btn-pri" onclick="renderRPS()">重新开始</button><button class="btn-sm btn-out" onclick="renderGameSelect()">返回</button></div>`;
+}
+function rpsPick(choice) {
+    const nameMap = { rock: '石头', scissors: '剪刀', paper: '布' };
+    document.querySelectorAll('.rps-choice').forEach(el => el.classList.remove('selected'));
+    const idx = { rock: 0, scissors: 1, paper: 2 }[choice];
+    document.querySelectorAll('.rps-choice')[idx].classList.add('selected');
+    const options = ['rock', 'scissors', 'paper'];
+    const partnerChoice = options[Math.floor(Math.random() * 3)];
+    const resultEl = document.getElementById('rpsResult');
+    resultEl.innerHTML = `<div style="display:flex;align-items:center;gap:10px;"><span style="font-size:20px;">${nameMap[choice]}</span><span class="vs">VS</span><span style="font-size:20px;">${nameMap[partnerChoice]}</span></div><div id="rpsVerdict" style="font-size:15px;margin-top:7px;"></div>`;
+    let verdict = '';
+    if (choice === partnerChoice) verdict = '平局！';
+    else if ((choice === 'rock' && partnerChoice === 'scissors') || (choice === 'scissors' && partnerChoice === 'paper') || (choice === 'paper' && partnerChoice === 'rock')) { verdict = '你赢了！'; rpsMyScore++; }
+    else { verdict = '对方赢了'; rpsPartnerScore++; }
+    document.getElementById('rpsVerdict').textContent = verdict;
+    document.getElementById('rpsScore').textContent = `我方 ${rpsMyScore} : ${rpsPartnerScore} 对方`;
+}
+
+// ================= 占卜 =================
+let divineDrawn = false;
+function openDivinePage() { goPage('home'); closeGamePage(); closeStorePage(); document.getElementById('divinePage').classList.add('active'); resetDivine(); }
+function closeDivinePage() { document.getElementById('divinePage').classList.remove('active'); }
+function resetDivine() { divineDrawn = false; document.getElementById('divineCards').innerHTML = ''; document.getElementById('divineResultText').innerHTML = ''; document.getElementById('divineQuestionInput').value = ''; document.getElementById('divineDrawBtn').disabled = false; document.getElementById('divineDrawBtn').textContent = '抽 三 张 牌'; }
+function drawTarot() {
+    if (divineDrawn) return; divineDrawn = true;
+    const btn = document.getElementById('divineDrawBtn'); btn.disabled = true; btn.textContent = '占卜中...';
+    const question = document.getElementById('divineQuestionInput').value.trim();
+    const picked = []; const used = new Set();
+    while (picked.length < 3) { const idx = Math.floor(Math.random() * FULL_TAROT_DECK.length); if (used.has(idx)) continue; used.add(idx); picked.push(FULL_TAROT_DECK[idx]); }
+    const cardsEl = document.getElementById('divineCards');
+    cardsEl.innerHTML = picked.map((c, i) => `
+        <div class="divine-card-slot" id="divineSlot${i}" onclick="flipDivineCard(${i})">
+            <div class="divine-card-face divine-card-back">✦</div>
+            <div class="divine-card-face divine-card-front">
+                ${c.image ? `<img src="${c.image}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">` : ''}
+                <div class="card-symbol" style="${c.image ? 'display:none;' : ''}">${c.symbol}</div>
+                <div class="card-name">${c.name}</div>
+                <div class="card-meaning">${c.meaning}</div>
+            </div>
+        </div>`).join('');
+    picked.forEach((c, i) => setTimeout(() => { const slot = document.getElementById('divineSlot' + i); if (slot) slot.classList.add('flipped'); }, 300 + i * 400));
+    setTimeout(() => {
+        btn.textContent = '已 抽 完';
+        const positions = ['过去', '现在', '未来'];
+        let resultHtml = `<div class="divine-result-text">`;
+        if (question) resultHtml += `<div style="margin-bottom:9px;"><span class="qt">你的问题：</span>${escapeHtml(question)}</div>`;
+        resultHtml += `<div style="margin-bottom:7px;"><span class="qt">牌阵解读：</span></div>`;
+        picked.forEach((c, i) => { resultHtml += `<div style="margin-bottom:7px;"><span style="color:#b88fe8;font-weight:600;">${positions[i]} · ${c.name}</span>：${c.meaning}</div>`; });
+        const guidance = ['牌面显示，顺其自然会有好的结果。','保持耐心，答案会在合适的时机浮现。','相信你的直觉，它比想象中更准。','当下的选择很重要，倾听内心的声音。','有些事不必强求，放下反而轻松。'];
+        resultHtml += `<div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.1);color:rgba(230,220,255,0.9);">指引：${guidance[Math.floor(Math.random() * guidance.length)]}</div></div>`;
+        document.getElementById('divineResultText').innerHTML = resultHtml;
+    }, 1700);
+}
+function flipDivineCard(i) { const slot = document.getElementById('divineSlot' + i); if (slot) slot.classList.add('flipped'); }
+
+// ================= 聊天核心 =================
+let currentChatId = null, typingTimer, replyTimer, replyTimeouts = [], renderedMsgCount = 0, quotingMsgId = null;
+
+function openChat(id) {
+    const chat = appData.chats.find(c => c.id === id); if (!chat) return;
+    currentChatId = id; chat.unread = 0; updateBadge(); saveData();
+    document.getElementById('chatHeaderName').innerHTML = `${chat.name} <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>`;
+    document.getElementById('chatHeaderAvatar').innerHTML = chat.avatar ? `<img src="${chat.avatar}">` : chat.name.charAt(0);
+    document.getElementById('chatPage').classList.add('active');
+    renderedMsgCount = 0; renderMessages(chat); applyWallpaper(); applyThemeClass(); cancelQuote();
+    markMyMessagesRead(chat);
+}
+
+function closeChat() {
+    document.getElementById('chatPage').classList.remove('active');
+    document.getElementById('plusPanel').classList.remove('active');
+    currentChatId = null; cancelQuote();
+    if (document.getElementById('pageMessages').classList.contains('active')) renderChatList();
+}
+
+function markMyMessagesRead(chat) {
+    let changed = false;
+    chat.messages.forEach(m => { if (m.sender === 'me' && !m.read) { m.read = true; changed = true; } });
+    if (changed) { saveData(); renderMessages(chat); }
+}
+
+function formatTime(ts) { if (!ts) return ''; const d = new Date(ts); return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`; }
+
+function renderMessages(chat, isIncremental = false) {
+    const box = document.getElementById('chatMessages');
+    const createMsgHTML = (m) => {
+        let bubbleContent = '', quoteHtml = '';
+        if (m.quote) { const quoteName = m.quote.sender === 'me' ? appData.myProfile.name : chat.name; quoteHtml = `<div class="msg-quote"><span class="quote-name">${escapeHtml(quoteName)}：</span>${escapeHtml(m.quote.text)}</div>`; }
+        if (m.type === 'image') { bubbleContent = `<img src="${m.text}" style="max-width:120px;border-radius:8px;display:block;">`; }
+        else if (m.type === 'qa') {
+            const qa = m.qaData;
+            const isMine = m.sender === 'me';
+            bubbleContent = `<div class="qa-card"><div class="qa-title"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>问问Ta</div><div class="qa-question">${escapeHtml(qa.question)}</div>${qa.options.map((opt, idx) => {
+                const isChosen = qa.partnerAnswer && qa.partnerAnswer.includes(idx);
+                const canClick = !isMine && !qa.partnerAnswer;
+                const clickAttr = canClick ? `onclick="answerQAInline('${m.id}', ${idx})"` : '';
+                return `<div class="qa-option-btn ${isChosen ? 'chosen' : ''} ${canClick ? '' : 'disabled'}" ${clickAttr} style="${canClick ? '' : 'cursor:default;opacity:0.85;'}">${escapeHtml(opt)}${isChosen ? '<div class="check"></div>' : ''}</div>`;
+            }).join('')}<div class="qa-status">${qa.partnerAnswer ? 'Ta已作答' : '等待Ta作答'}</div></div>`;
+        }
+        else if (m.type === 'divine') {
+            const d = m.divineData;
+            bubbleContent = `<div class="divine-card"><div class="dc-type ${d.type}">${d.type === 'tarot' ? 'TAROT 塔罗' : 'LENORMAND 雷诺曼'}</div><div class="dc-image" style="background:${d.color || '#f0e6d8'};">${d.image ? `<img src="${d.image}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">` : ''}<span class="dc-symbol" style="${d.image ? 'display:none;' : ''}">${d.symbol}</span></div><div class="dc-name">${escapeHtml(d.name)}</div><div class="dc-meaning">${escapeHtml(d.meaning)}</div></div>`;
+        }
+        else if (m.type === 'call_record') {
+            const c = m.callData;
+            bubbleContent = `
+                <div class="call-record-card">
+                    <div class="call-record-icon ${c.type === 'voice' ? 'voice' : ''}">
+                        <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                    </div>
+                    <div class="call-record-info">
+                        <div class="call-record-title">语音通话</div>
+                        <div class="call-record-desc">通话时长 ${c.duration}</div>
+                    </div>
+                </div>`;
+        }
+        else { bubbleContent = escapeHtml(m.text); }
+
+        const noBubble = (m.type === 'qa' || m.type === 'divine' || m.type === 'call_record');
+        const readHtml = (m.sender === 'me') ? (m.read ? '<span class="msg-read-text">已读</span>' : '<span class="msg-read-text" style="color:#bbb;">未读</span>') : '';
+        return `<div class="msg-row ${m.sender === 'me' ? 'sent' : 'recv'}" data-msg-id="${m.id}">
+            <div class="msg-avatar">${m.sender === 'me' ? (appData.myProfile.avatar ? `<img src="${appData.myProfile.avatar}">` : appData.myProfile.name.charAt(0)) : (chat.avatar ? `<img src="${chat.avatar}">` : chat.name.charAt(0))}</div>
+            <div class="msg-bubble-wrap"><div class="msg-bubble" style="${noBubble ? 'background:transparent;padding:0;box-shadow:none;' : ''}">${quoteHtml}${bubbleContent}</div><div class="msg-meta"><span>${formatTime(m.time || Date.now())}</span>${readHtml}</div></div>
+        </div>`;
+    };
+    if (isIncremental && renderedMsgCount > 0 && chat.messages.length > renderedMsgCount) {
+        let newHTML = ''; for (let i = renderedMsgCount; i < chat.messages.length; i++) newHTML += createMsgHTML(chat.messages[i]);
+        box.insertAdjacentHTML('beforeend', newHTML); renderedMsgCount = chat.messages.length;
+    } else {
+        let allHTML = ''; chat.messages.forEach(m => { allHTML += createMsgHTML(m); });
+        box.innerHTML = allHTML; renderedMsgCount = chat.messages.length;
+    }
+    requestAnimationFrame(() => { box.scrollTop = box.scrollHeight; });
+}
+
+function answerQAInline(msgId, idx) {
+    const chat = appData.chats.find(c => c.id === currentChatId); if (!chat) return;
+    const msg = chat.messages.find(m => m.id === msgId); if (!msg || msg.type !== 'qa') return;
+    if (msg.qaData.partnerAnswer && msg.qaData.partnerAnswer.length > 0) return;
+    msg.qaData.partnerAnswer = [idx]; renderMessages(chat); saveData();
+}
+
+let tapTimerChat = null, lastTapMsgId = null, lastTapTime = 0;
+function setupDoubleClickQuote() {
+    document.addEventListener('click', (e) => {
+        if (!currentChatId) return;
+        const msgRow = e.target.closest('.msg-row');
+        if (!msgRow) return;
+        if (e.target.closest('.qa-option-btn') || e.target.closest('.invite-card') || e.target.closest('.divine-card') || e.target.closest('button')) return;
+        const msgId = msgRow.dataset.msgId;
+        if (!msgId) return;
+        const now = Date.now();
+        if (lastTapMsgId === msgId && now - lastTapTime < 350) {
+            triggerQuote(msgId);
+            lastTapMsgId = null; lastTapTime = 0;
+            if (tapTimerChat) clearTimeout(tapTimerChat);
+        } else {
+            lastTapMsgId = msgId; lastTapTime = now;
+            if (tapTimerChat) clearTimeout(tapTimerChat);
+            tapTimerChat = setTimeout(() => { lastTapMsgId = null; lastTapTime = 0; }, 400);
+        }
+    });
+}
+
+function triggerQuote(msgId) {
+    const chat = appData.chats.find(c => c.id === currentChatId); if (!chat) return;
+    const msg = chat.messages.find(m => m.id === msgId); if (!msg) return;
+    quotingMsgId = msgId;
+    const previewBar = document.getElementById('quotePreviewBar'), previewContent = document.getElementById('quotePreviewContent');
+    const senderName = msg.sender === 'me' ? appData.myProfile.name : chat.name;
+    let text = '';
+    if (msg.type === 'image') text = '[图片]';
+    else if (msg.type === 'qa') text = '[问卷] ' + (msg.qaData ? msg.qaData.question : '');
+    else if (msg.type === 'divine') text = `[${msg.divineData.type === 'tarot' ? '塔罗' : '雷诺曼'}] ${msg.divineData.name}`;
+    else if (msg.type === 'call_record') text = `[通话] ${msg.callData.duration}`;
+    else text = msg.text;
+    previewContent.innerHTML = `<span style="color:var(--primary-dark);font-weight:600;">${escapeHtml(senderName)}：</span>${escapeHtml(text)}`;
+    previewBar.classList.add('active');
+    document.getElementById('chatInput').focus();
+    document.querySelectorAll('.msg-bubble.selected-quote').forEach(el => el.classList.remove('selected-quote'));
+    const targetBubble = document.querySelector(`.msg-row[data-msg-id="${msgId}"] .msg-bubble`);
+    if (targetBubble) { targetBubble.classList.add('selected-quote'); setTimeout(() => targetBubble.classList.remove('selected-quote'), 1000); }
+}
+
+function cancelQuote() { quotingMsgId = null; document.getElementById('quotePreviewBar').classList.remove('active'); }
+
+function sendMsg() {
+    const input = document.getElementById('chatInput'), text = input.value.trim();
+    if (!text || !currentChatId) return;
+    const chat = appData.chats.find(c => c.id === currentChatId);
+    const newMsg = { sender: 'me', text, type: 'text', time: Date.now(), read: false };
+    if (quotingMsgId) {
+        const quoted = chat.messages.find(m => m.id === quotingMsgId);
+        if (quoted) {
+            let quoteText = quoted.type === 'image' ? '[图片]' : (quoted.text || '');
+            if (quoted.type === 'qa') quoteText = '[问卷] ' + (quoted.qaData ? quoted.qaData.question : '');
+            if (quoted.type === 'divine') quoteText = `[${quoted.divineData.type === 'tarot' ? '塔罗' : '雷诺曼'}] ${quoted.divineData.name}`;
+            if (quoted.type === 'call_record') quoteText = `[通话] ${quoted.callData.duration}`;
+            newMsg.quote = { sender: quoted.sender, text: quoteText, msgId: quoted.id };
+        }
+        cancelQuote();
+    }
+    chat.messages.push(newMsg); chat.lastMsg = text; input.value = '';
+    renderMessages(chat, true); saveData(); triggerReply(chat);
+}
+
+function createQA() {
+    document.getElementById('plusPanel').classList.remove('active');
+    showModal(`<h3>问问Ta</h3><div class="form-group"><label>问题</label><input id="qaQuestion" placeholder="例如：今晚想吃什么？"></div><div class="form-group"><label>选项（用逗号分隔）</label><input id="qaOptions" placeholder="例如：火锅, 烧烤"></div><div class="m-actions"><button class="m-cancel" onclick="closeModal()">取消</button><button class="m-confirm" onclick="submitQA()">发送</button></div>`);
+}
+
+function submitQA() {
+    const q = document.getElementById('qaQuestion').value.trim(), optsStr = document.getElementById('qaOptions').value.trim();
+    if (!q || !optsStr) { alert('请填写完整'); return; }
+    const opts = optsStr.split(/[,，]/).map(s => s.trim()).filter(Boolean);
+    if (opts.length < 2) { alert('至少需要两个选项'); return; }
+    if (!currentChatId) return;
+    const chat = appData.chats.find(c => c.id === currentChatId);
+    const msgId = 'm' + Date.now();
+    chat.messages.push({ id: msgId, sender: 'me', type: 'qa', text: '[问卷]', time: Date.now(), read: false, qaData: { question: q, options: opts, multi: false, myAnswer: null, partnerAnswer: null } });
+    chat.lastMsg = '[问卷]'; renderMessages(chat, true); saveData(); closeModal(); triggerReply(chat, 'qa', msgId);
+}
+
+let toastTimer = null, toastChatId = null;
+function showToast(chat, text) {
+    const toast = document.getElementById('toastNotification');
+    document.getElementById('toastAvatar').innerHTML = chat.avatar ? `<img src="${chat.avatar}">` : chat.name.charAt(0);
+    document.getElementById('toastName').textContent = chat.name;
+    document.getElementById('toastMessage').textContent = text;
+    toastChatId = chat.id; toast.classList.add('show');
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => hideToast(), 4000);
+}
+function hideToast() { document.getElementById('toastNotification').classList.remove('show'); if (toastTimer) clearTimeout(toastTimer); toastChatId = null; }
+function openChatFromToast() { if (toastChatId) { const id = toastChatId; hideToast(); goPage('messages'); openChat(id); } }
+function isChatVisible(chatId) { return document.getElementById('chatPage').classList.contains('active') && currentChatId === chatId; }
+function isAnyChatOpen() { return document.getElementById('chatPage').classList.contains('active'); }
+
+function triggerReply(chat, type = 'text', qaMsgId = null) {
+    clearTimeout(typingTimer); clearTimeout(replyTimer); replyTimeouts.forEach(clearTimeout); replyTimeouts = [];
+    const settings = appData.settings;
+    const delayMs = (settings.replyDelayMin + Math.random() * (settings.replyDelayMax - settings.replyDelayMin)) * 1000;
+    typingTimer = setTimeout(() => {
+        if (isChatVisible(chat.id)) {
+            const box = document.getElementById('chatMessages');
+            const div = document.createElement('div'); div.id = 'typingIndicator'; div.className = 'typing-indicator';
+            div.innerHTML = `对方正在输入 <div class="typing-dots"><span></span><span></span><span></span></div>`;
+            box.appendChild(div); box.scrollTop = box.scrollHeight;
+        }
+    }, Math.min(delayMs * 0.5, 3000));
+    replyTimer = setTimeout(() => {
+        const el = document.getElementById('typingIndicator'); if (el) el.remove();
+        if (type === 'qa') {
+            const msg = chat.messages.find(m => m.id === qaMsgId);
+            if (msg) {
+                const qa = msg.qaData; const answerIndices = [Math.floor(Math.random() * qa.options.length)];
+                qa.partnerAnswer = answerIndices;
+                if (isChatVisible(chat.id)) renderMessages(chat);
+                saveData();
+                chat.messages.push({ sender: 'other', text: '我答完啦，快看看~', type: 'text', time: Date.now() });
+                chat.lastMsg = '我答完啦，快看看~';
+                if (isChatVisible(chat.id)) renderMessages(chat, true); else if (!isAnyChatOpen()) chat.unread = (chat.unread || 0) + 1;
+                saveData(); updateBadge();
+                if (!isChatVisible(chat.id)) showToast(chat, '我答完啦，快看看~');
+            }
+        } else {
+            const minC = Math.max(1, settings.replyCountMin || 1), maxC = Math.max(minC, settings.replyCountMax || minC);
+            let count = minC + Math.floor(Math.random() * (maxC - minC + 1));
+            const myRecentMsgs = chat.messages.filter(m => m.sender === 'me').slice(-5);
+            const quoteProb = settings.quoteProbability || 0;
+            for (let i = 0; i < count; i++) {
+                const isDivine = settings.divineSendEnabled && (Math.random() * 100 < (settings.divineSendProbability || 20));
+                let content, msgType, divineData = null;
+                if (isDivine) { divineData = randomDivineCard(); msgType = 'divine'; content = `[${divineData.type === 'tarot' ? '塔罗' : '雷诺曼'}] ${divineData.name}`; }
+                else { content = getPartnerReplyText(); msgType = 'text'; if (content && content.startsWith && content.startsWith('data:image')) msgType = 'image'; }
+                let quote = null;
+                if (msgType !== 'divine' && myRecentMsgs.length > 0 && Math.random() * 100 < quoteProb) {
+                    const q = myRecentMsgs[Math.floor(Math.random() * myRecentMsgs.length)];
+                    let qText = q.type === 'image' ? '[图片]' : (q.text || '');
+                    quote = { sender: q.sender, text: qText, msgId: q.id };
+                }
+                const t = setTimeout(() => {
+                    const newMsg = { sender: 'other', text: content, type: msgType, time: Date.now() };
+                    if (quote) newMsg.quote = quote; if (divineData) newMsg.divineData = divineData;
+                    chat.messages.push(newMsg); chat.lastMsg = msgType === 'divine' ? content : (msgType === 'image' ? '[表情包]' : content);
+                    if (isChatVisible(chat.id)) { renderMessages(chat, true); markMyMessagesRead(chat); }
+                    else if (!isAnyChatOpen()) { chat.unread = (chat.unread || 0) + 1; updateBadge(); showToast(chat, chat.lastMsg); }
+                    saveData(); if (document.getElementById('pageMessages').classList.contains('active')) renderChatList();
+                }, i * 800);
+                replyTimeouts.push(t);
+            }
+        }
+    }, delayMs);
+}
+
+function pickImage() { document.getElementById('plusPanel').classList.remove('active'); document.getElementById('imageInput').click(); }
+async function handleImageUpload(e) {
+    if (!currentChatId || !e.target.files[0]) return;
+    const base64 = await readFile(e.target.files[0]);
+    const chat = appData.chats.find(c => c.id === currentChatId);
+    const newMsg = { sender: 'me', text: base64, type: 'image', time: Date.now(), read: false };
+    if (quotingMsgId) { const quoted = chat.messages.find(m => m.id === quotingMsgId); if (quoted) { let quoteText = quoted.type === 'image' ? '[图片]' : (quoted.text || ''); newMsg.quote = { sender: quoted.sender, text: quoteText, msgId: quoted.id }; } cancelQuote(); }
+    chat.messages.push(newMsg); chat.lastMsg = '[图片]'; renderMessages(chat, true); saveData(); e.target.value = ''; triggerReply(chat);
+}
+
+let currentEmojiType = 'sticker';
+function togglePlusPanel() { const panel = document.getElementById('plusPanel'); panel.classList.toggle('active'); if (panel.classList.contains('active')) renderEmojiGrid(); }
+function switchEmojiTab(type, btn) { currentEmojiType = type; document.querySelectorAll('.e-tab').forEach(b => b.classList.remove('active')); btn.classList.add('active'); renderEmojiGrid(); }
+function renderEmojiGrid() {
+    const grid = document.getElementById('emojiGrid'); let items = [];
+    appData.settings.publicCardLib.groups.forEach(g => { if (currentEmojiType === 'sticker') items = items.concat(g.stickerCards || []); if (currentEmojiType === 'emoji') items = items.concat(g.emojiCards || []); if (currentEmojiType === 'kaomoji') items = items.concat(g.kaomojiCards || []); });
+    if (items.length === 0) { grid.innerHTML = '<div style="font-size:11px;color:#999;padding:9px;">暂无字卡</div>'; return; }
+    grid.innerHTML = items.map(item => { if (currentEmojiType === 'sticker') return `<div class="e-item" onclick="sendSticker('${item}')"><img src="${item}"></div>`; return `<div class="e-item" onclick="insertEmoji('${escapeHtml(item)}')">${escapeHtml(item)}</div>`; }).join('');
+}
+function insertEmoji(txt) { const input = document.getElementById('chatInput'); input.value += txt; input.focus(); document.getElementById('plusPanel').classList.remove('active'); }
+function sendSticker(base64) {
+    if (!currentChatId) return;
+    const chat = appData.chats.find(c => c.id === currentChatId);
+    const newMsg = { sender: 'me', text: base64, type: 'image', time: Date.now(), read: false };
+    if (quotingMsgId) { const quoted = chat.messages.find(m => m.id === quotingMsgId); if (quoted) { let quoteText = quoted.type === 'image' ? '[图片]' : (quoted.text || ''); newMsg.quote = { sender: quoted.sender, text: quoteText, msgId: quoted.id }; } cancelQuote(); }
+    chat.messages.push(newMsg); chat.lastMsg = '[表情包]'; renderMessages(chat, true); saveData(); document.getElementById('plusPanel').classList.remove('active'); triggerReply(chat);
+}
+function sendDivineCardToChat() {
+    document.getElementById('plusPanel').classList.remove('active');
+    if (!currentChatId) return;
+    const card = randomDivineCard();
+    const chat = appData.chats.find(c => c.id === currentChatId);
+    chat.messages.push({ sender: 'me', type: 'divine', text: `[${card.type === 'tarot' ? '塔罗' : '雷诺曼'}] ${card.name}`, time: Date.now(), read: false, divineData: card });
+    chat.lastMsg = `[${card.type === 'tarot' ? '塔罗' : '雷诺曼'}] ${card.name}`;
+    renderMessages(chat, true); saveData();
+}
+
+// ================= 日记 =================
+let diaryViewYear = new Date().getFullYear(), diaryViewMonth = new Date().getMonth();
+function goDiaryPage() { document.getElementById('diaryPage').classList.add('active'); const now = new Date(); diaryViewYear = now.getFullYear(); diaryViewMonth = now.getMonth(); renderDiary(); }
+function closeDiaryPage() { document.getElementById('diaryPage').classList.remove('active'); }
+function changeDiaryMonth(delta) { diaryViewMonth += delta; if (diaryViewMonth < 0) { diaryViewMonth = 11; diaryViewYear--; } if (diaryViewMonth > 11) { diaryViewMonth = 0; diaryViewYear++; } renderDiary(); }
+function getDateStr(y, m, d) { return `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`; }
+function getTodayDate() { const d = new Date(); return getDateStr(d.getFullYear(), d.getMonth(), d.getDate()); }
+function renderDiary() {
+    const today = getTodayDate(), y = diaryViewYear, m = diaryViewMonth;
+    document.getElementById('diaryMonthLabel').textContent = `${y}年${m+1}月`;
+    const firstDay = new Date(y, m, 1).getDay(), daysInMonth = new Date(y, m+1, 0).getDate();
+    const recordMap = {}; appData.diary.forEach(r => recordMap[r.date] = r);
+    let html = '<div class="calendar-grid">';
+    ['日','一','二','三','四','五','六'].forEach(w => html += `<div class="calendar-weekday">${w}</div>`);
+    for (let i = 0; i < firstDay; i++) html += `<div class="calendar-cell empty"></div>`;
+    for (let d = 1; d <= daysInMonth; d++) {
+        const dateStr = getDateStr(y, m, d); const rec = recordMap[dateStr]; const isToday = dateStr === today;
+        const hasMood = rec && (rec.myEmoji || rec.partnerEmoji);
+        const myEmoji = rec && rec.myEmoji ? rec.myEmoji : '', partnerEmoji = rec && rec.partnerEmoji ? rec.partnerEmoji : '';
+        let cellClass = 'calendar-cell'; if (isToday) cellClass += ' today'; if (hasMood) cellClass += ' has-mood';
+        html += `<div class="${cellClass}" onclick="showDiaryDetail('${dateStr}')"><span class="day-num">${d}</span>${myEmoji ? `<span class="day-emoji">${myEmoji}</span>` : ''}${partnerEmoji && !myEmoji ? `<span class="day-emoji">${partnerEmoji}</span>` : ''}</div>`;
+    }
+    html += '</div><div id="diaryDetailContainer"></div>';
+    document.getElementById('diaryContent').innerHTML = html;
+    const todayDate = new Date(); if (todayDate.getFullYear() === y && todayDate.getMonth() === m) showDiaryDetail(today);
+}
+function showDiaryDetail(dateStr) {
+    const container = document.getElementById('diaryDetailContainer'); if (!container) return;
+    let rec = appData.diary.find(r => r.date === dateStr); const isToday = dateStr === getTodayDate();
+    if (!rec) {
+        if (isToday) { const emojis = ['😊', '🥰', '😎', '😢', '😡', '😴', '🤔', '🥳', '🥺', '😋']; rec = { date: dateStr, myEmoji: null, partnerEmoji: emojis[Math.floor(Math.random() * emojis.length)] }; appData.diary.unshift(rec); saveData(); }
+        else { container.innerHTML = `<div class="diary-detail-card"><div class="diary-detail-date"><span>${dateStr}</span><span>没有记录</span></div><div style="text-align:center;color:#999;padding:18px 0;">这一天没有心情记录</div></div>`; return; }
+    }
+    const emojiOptions = ['😊', '🥰', '😎', '😢', '😡', '😴', '🤔', '🥳', '🥺', '😋', '💩', '👻'];
+    let emojiBtns = ''; emojiOptions.forEach(emoji => { const isActive = rec.myEmoji === emoji ? 'active' : ''; emojiBtns += `<div class="emoji-opt ${isActive}" onclick="selectMoodForDate('${dateStr}', '${emoji}')">${emoji}</div>`; });
+    container.innerHTML = `<div class="diary-detail-card"><div class="diary-detail-date"><span>${dateStr}</span><span>${isToday ? '今天' : ''}</span></div><div class="diary-mood-row"><div class="diary-mood-item"><div class="label">我的心情</div><div class="emoji-big">${rec.myEmoji || '❓'}</div></div><div class="diary-mood-item"><div class="label">对方的心情</div><div class="emoji-big">${rec.partnerEmoji || '❓'}</div></div></div>${!rec.myEmoji ? `<div class="diary-emoji-row"><div class="hint">选择你此刻的心情：</div>${emojiBtns}</div>` : ''}</div>`;
+}
+function selectMoodForDate(dateStr, emoji) { let rec = appData.diary.find(r => r.date === dateStr); if (!rec || rec.myEmoji) return; rec.myEmoji = emoji; saveData(); renderDiary(); }
+
+// ================= 信箱 =================
+function goMailboxPage() { document.getElementById('mailboxPage').classList.add('active'); renderMailbox(); let changed = false; appData.letters.forEach(l => { if (l.from === 'partner' && !l.read) { l.read = true; changed = true; } }); if (changed) saveData(); updateBadge(); }
+function closeMailboxPage() { document.getElementById('mailboxPage').classList.remove('active'); updateBadge(); }
+function renderMailbox() {
+    const container = document.getElementById('mailboxContent');
+    if (appData.letters.length === 0) { container.innerHTML = '<div style="text-align:center;padding:50px 18px;color:#999;">还没有信件，点右上角写一封吧</div>'; return; }
+    const sorted = [...appData.letters].sort((a,b) => b.time - a.time);
+    container.innerHTML = sorted.map(letter => {
+        const fromName = letter.from === 'me' ? appData.myProfile.name : appData.partner.name;
+        const isUnread = letter.from === 'partner' && !letter.read;
+        return `<div class="mail-card ${isUnread ? 'unread' : ''}" onclick="markLetterRead('${letter.id}')"><div class="mail-from">${letter.from === 'me' ? '我寄出' : escapeHtml(fromName) + '寄来'}<span class="mail-time">${formatLetterTime(letter.time)}</span></div><div class="mail-body">${escapeHtml(letter.content)}</div>${letter.replied ? '<div style="margin-top:7px;font-size:11px;color:#999;">已回信</div>' : ''}${letter.from === 'partner' && !letter.replied ? `<div class="mail-actions"><button class="btn-sm btn-pri" onclick="event.stopPropagation();openReplyLetter('${letter.id}')">回信</button></div>` : ''}</div>`;
+    }).join('');
+}
+function formatLetterTime(ts) { const d = new Date(ts); return `${d.getMonth()+1}月${d.getDate()}日 ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; }
+function markLetterRead(id) { const letter = appData.letters.find(l => l.id === id); if (letter && !letter.read) { letter.read = true; saveData(); renderMailbox(); updateBadge(); } }
+function openLetterEditor() { showModal(`<h3>写一封信</h3><div class="letter-editor"><div class="letter-paper"><textarea id="letterContent" placeholder="亲爱的${escapeHtml(appData.partner.name)}：&#10;&#10;写下你想说的话..."></textarea></div></div><div class="m-actions"><button class="m-cancel" onclick="closeModal()">取消</button><button class="m-confirm" onclick="sendLetter()">寄出</button></div>`); }
+function sendLetter() {
+    const content = document.getElementById('letterContent').value.trim(); if (!content) { alert('信件内容不能为空'); return; }
+    appData.letters.push({ id: 'l' + Date.now(), from: 'me', content, time: Date.now(), read: true, replied: false });
+    saveData(); closeModal(); renderMailbox(); schedulePartnerReply(Date.now());
+}
+function openReplyLetter(letterId) {
+    const letter = appData.letters.find(l => l.id === letterId); if (!letter) return;
+    showModal(`<h3>回信给${escapeHtml(appData.partner.name)}</h3><div style="background:rgba(0,0,0,0.04);padding:9px;border-radius:8px;margin-bottom:10px;font-size:12px;color:#666;max-height:90px;overflow-y:auto;"><div style="font-weight:600;margin-bottom:3px;">原信：</div>${escapeHtml(letter.content)}</div><div class="letter-editor"><div class="letter-paper"><textarea id="letterContent" placeholder="写下你的回信..."></textarea></div></div><div class="m-actions"><button class="m-cancel" onclick="closeModal()">取消</button><button class="m-confirm" onclick="sendReplyLetter('${letterId}')">寄出</button></div>`);
+}
+function sendReplyLetter(letterId) {
+    const content = document.getElementById('letterContent').value.trim(); if (!content) { alert('回信内容不能为空'); return; }
+    const original = appData.letters.find(l => l.id === letterId); if (original) original.replied = true;
+    appData.letters.push({ id: 'l' + Date.now(), from: 'me', content, time: Date.now(), read: true, replied: true, replyTo: letterId });
+    saveData(); closeModal(); renderMailbox();
+}
+function schedulePartnerReply(sentTime) {
+    const minH = appData.settings.letterReplyMin, maxH = appData.settings.letterReplyMax;
+    const delayMs = (minH + Math.random() * (maxH - minH)) * 60 * 60 * 1000;
+    setTimeout(() => { const content = generateLetterFromCards(); appData.letters.push({ id: 'l' + Date.now(), from: 'partner', content, time: Date.now(), read: false, replied: false }); saveData(); updateBadge(); if (document.getElementById('mailboxPage').classList.contains('active')) renderMailbox(); }, delayMs);
+}
+setInterval(() => {
+    const now = Date.now(), last = appData.settings.lastLetterTime || 0;
+    const minMs = appData.settings.letterWriteMin * 60 * 60 * 1000;
+    if (now - last > minMs && Math.random() > 0.5) {
+        const content = generateLetterFromCards();
+        appData.letters.push({ id: 'l' + Date.now(), from: 'partner', content, time: Date.now(), read: false, replied: false });
+        appData.settings.lastLetterTime = now; saveData(); updateBadge();
+        if (document.getElementById('mailboxPage').classList.contains('active')) renderMailbox();
+    }
+}, 60000);
+
+// ================= 朋友圈 =================
+function goMomentsPage() { document.getElementById('momentsPage').classList.add('active'); renderMoments(); }
+function closeMoments() { document.getElementById('momentsPage').classList.remove('active'); }
+function escapeHtml(str) { return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+function importCss(editorId) {
+    const input = document.getElementById('cssFileInput'); input.value = '';
+    input.onchange = (e) => { if (!e.target.files[0]) return; const reader = new FileReader(); reader.onload = (ev) => { const el = document.getElementById(editorId); el.value = ev.target.result; updatePreview(); appData.settings.globalTheme.globalCss = el.value; saveData(); applyGlobalCssToPage(); applyWallpaper(); alert('CSS 导入成功'); }; reader.readAsText(e.target.files[0]); };
+    input.click();
+}
+function copyCss(editorId) { const el = document.getElementById(editorId); if (!el.value.trim()) return alert('没有可复制的内容'); navigator.clipboard.writeText(el.value).then(() => alert('已复制')).catch(() => { el.select(); document.execCommand('copy'); alert('已复制'); }); }
+function formatMomentTime(ts) { const diff = Date.now() - ts; const h = Math.floor(diff / 3600000), m = Math.floor(diff / 60000); if (m < 1) return '刚刚'; if (h < 1) return `${m}分钟前`; if (h < 24) return `${h}小时前`; if (h < 48) return '昨天'; return `${Math.floor(h/24)}天前`; }
+function renderMoments() {
+    const feed = document.getElementById('momentsFeed');
+    if (!appData.moments.length) { feed.innerHTML = '<div style="text-align:center;padding:36px;color:#999;">暂无动态，点右上角相机发布吧</div>'; return; }
+    feed.innerHTML = appData.moments.map(m => {
+        const isMine = m.author === 'me';
+        const authorName = isMine ? appData.myProfile.name : appData.partner.name;
+        const authorAvatar = isMine ? (appData.myProfile.avatar ? `<img src="${appData.myProfile.avatar}">` : appData.myProfile.name.charAt(0)) : (appData.partner.avatar ? `<img src="${appData.partner.avatar}">` : appData.partner.name.charAt(0));
+        let commentsHtml = '';
+        if (m.comments && m.comments.length > 0) {
+            commentsHtml = `<div class="moment-comments">` + m.comments.map(c => { const cName = c.isMe ? appData.myProfile.name : appData.partner.name; const delBtn = c.isMe ? `<span class="comment-del" onclick="deleteComment('${m.id}', '${c.id}')">删除</span>` : ''; return `<div class="comment-item"><span class="comment-name">${escapeHtml(cName)}：</span><span class="comment-text">${escapeHtml(c.text)}</span> ${delBtn}</div>`; }).join('') + `</div>`;
+        }
+        const isLikedClass = m.isLikedByMe ? 'liked' : '';
+        return `<div class="moment-item"><div class="moment-header"><div class="moment-avatar">${authorAvatar}</div><div class="moment-nickname">${escapeHtml(authorName)}</div></div><div class="moment-content">${escapeHtml(m.content)}</div>${m.images && m.images.length ? `<div class="moment-images">${m.images.map(img=>`<img src="${img}">`).join('')}</div>` : ''}${commentsHtml}<div class="moment-footer"><div class="moment-time">${formatMomentTime(m.time)}</div><div class="moment-actions"><svg viewBox="0 0 24 24" class="${isLikedClass}" onclick="toggleLike('${m.id}')"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>${m.likes > 0 ? `<span class="action-count">${m.likes}</span>` : ''}<svg viewBox="0 0 24 24" onclick="addComment('${m.id}')"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>${m.comments && m.comments.length > 0 ? `<span class="action-count">${m.comments.length}</span>` : ''}</div></div></div>`;
+    }).join('');
+}
+function toggleLike(id) { const m = appData.moments.find(x => x.id === id); if (!m) return; m.isLikedByMe = !m.isLikedByMe; m.likes = (m.likes || 0) + (m.isLikedByMe ? 1 : -1); if (m.likes < 0) m.likes = 0; saveData(); renderMoments(); }
+function addComment(id) {
+    const m = appData.moments.find(x => x.id === id); if (!m) return;
+    const text = prompt('发表评论：'); if (!text || !text.trim()) return;
+    if (!m.comments) m.comments = []; m.comments.push({ id: 'c' + Date.now(), text: text.trim(), isMe: true });
+    saveData(); renderMoments();
+    if (m.author === 'other') { const delayMs = appData.settings.momentReplyDelay * 60 * 1000; setTimeout(() => { const replies = ['我也想你啦', '哈哈，是呀', '贴贴', '你怎么这么可爱', '爱你哦']; m.comments.push({ id: 'c' + Date.now(), text: replies[Math.floor(Math.random() * replies.length)], isMe: false }); saveData(); if (document.getElementById('momentsPage').classList.contains('active')) renderMoments(); }, delayMs); }
+}
+function deleteComment(momentId, commentId) { if (!confirm('删除这条评论？')) return; const m = appData.moments.find(x => x.id === momentId); if (!m) return; m.comments = m.comments.filter(c => c.id !== commentId); saveData(); renderMoments(); }
+function publishMoment() { showModal(`<h3>发布动态</h3><div class="form-group"><textarea id="momentContent" placeholder="把想说的话，留在这里..."></textarea></div><div class="form-group"><input type="file" id="momentImgSelect" accept="image/*" multiple></div><div class="m-actions"><button class="m-cancel" onclick="closeModal()">取消</button><button class="m-confirm" onclick="saveMoment()">发布</button></div>`); }
+async function saveMoment() {
+    const text = document.getElementById('momentContent').value.trim(); if (!text) return;
+    const files = document.getElementById('momentImgSelect').files; const images = [];
+    for (let i = 0; i < files.length; i++) images.push(await readFile(files[i]));
+    const newMoment = { id: 'm' + Date.now(), author: 'me', content: text, images, time: Date.now(), likes: 0, isLikedByMe: false, comments: [] };
+    appData.moments.unshift(newMoment); saveData(); closeModal(); renderMoments();
+    if (appData.settings.momentsAutoPost !== false) { const delayMs = appData.settings.momentCommentDelay * 60 * 1000; setTimeout(() => { if (Math.random() > 0.3) newMoment.likes = (newMoment.likes || 0) + 1; if (Math.random() > 0.5) { const replies = ['哇，真好看！', '你在干嘛呢？', '想你了', '拍得真好', '下次带我一起呀']; newMoment.comments.push({ id: 'c' + Date.now(), text: replies[Math.floor(Math.random() * replies.length)], isMe: false }); } saveData(); if (document.getElementById('momentsPage').classList.contains('active')) renderMoments(); }, delayMs); }
+}
+setInterval(() => {
+    if (!appData.settings.momentsAutoPost) return;
+    const now = Date.now(), lastTime = appData.settings.lastMomentPostTime || 0, minMs = appData.settings.momentPostMin * 60 * 1000;
+    if (now - lastTime > minMs) {
+        if (Math.random() > 0.5) { const posts = ['刚刚发了会儿呆，回过神来发现又在想你了。', '今天很好，风很轻，云也好看。只是差一点，就差你在身边。', '把最近循环的歌单整理好了。等你来的时候，一首一首放给你听。', '想你的第100天。', '如果你在就好了。', '爱你，胜过昨天，略逊于明天。']; appData.moments.unshift({ id: 'm' + Date.now(), author: 'other', content: posts[Math.floor(Math.random() * posts.length)], images: [], time: Date.now(), likes: 0, isLikedByMe: false, comments: [] }); appData.settings.lastMomentPostTime = now; saveData(); if (document.getElementById('momentsPage').classList.contains('active')) renderMoments(); }
+        else { appData.settings.lastMomentPostTime = now; saveData(); }
+    }
+}, 10000);
+
+// ================= 美化 =================
+function renderBeautify() {
+    const theme = appData.settings.globalTheme;
+    document.getElementById('wallpaperPreview').style.backgroundImage = theme.chatWallpaper ? `url(${theme.chatWallpaper})` : 'none';
+    document.getElementById('homeBgPreview').style.backgroundImage = appData.customHomeBg ? `url(${appData.customHomeBg})` : 'none';
+    document.getElementById('globalCssEditor').value = theme.globalCss || '';
+    updatePreview();
+}
+function uploadWallpaper() { const input = document.getElementById('wallpaperUploadInput'); input.onchange = async (e) => { if (!e.target.files[0]) return; appData.settings.globalTheme.chatWallpaper = await readFile(e.target.files[0]); await saveData(); renderBeautify(); applyWallpaper(); }; input.click(); }
+function removeWallpaper() { appData.settings.globalTheme.chatWallpaper = null; saveData(); renderBeautify(); applyWallpaper(); }
+function applyWallpaper() { const el = document.getElementById('chatMessages'); if (!el) return; if (appData.settings.globalTheme.chatWallpaper) { el.style.backgroundImage = `url(${appData.settings.globalTheme.chatWallpaper})`; el.style.backgroundSize = 'cover'; el.style.backgroundPosition = 'center'; } else el.style.backgroundImage = 'none'; }
+function uploadHomeBg() { const input = document.getElementById('homeBgUploadInput'); input.onchange = async (e) => { if (!e.target.files[0]) return; appData.customHomeBg = await readFile(e.target.files[0]); await saveData(); renderBeautify(); applyHomeBg(); }; input.click(); }
+function removeHomeBg() { appData.customHomeBg = null; saveData(); renderBeautify(); applyHomeBg(); }
+function applyHomeBg() { const el = document.getElementById('homeBgContainer'); if (!el) return; if (appData.customHomeBg) { el.style.backgroundImage = `url(${appData.customHomeBg})`; el.style.backgroundSize = 'cover'; el.style.backgroundPosition = 'center'; } else el.style.backgroundImage = 'none'; }
+function updatePreview() { const css = document.getElementById('globalCssEditor').value; document.getElementById('previewStyle').textContent = css; }
+function applyGlobalCss() { appData.settings.globalTheme.globalCss = document.getElementById('globalCssEditor').value; saveData(); applyGlobalCssToPage(); applyWallpaper(); alert('全局样式已应用'); }
+function applyGlobalCssToPage() { let style = document.getElementById('dynamicGlobalStyle'); if (style) style.remove(); let css = appData.settings.globalTheme.globalCss; if (css) { style = document.createElement('style'); style.id = 'dynamicGlobalStyle'; style.textContent = css; document.head.appendChild(style); } }
+
+// ================= 主题 =================
+function applyThemeClass() {
+    const t = appData.activeTheme || 'default';
+    document.body.classList.remove('theme-wechat','theme-qq','theme-pink','theme-simple');
+    if (t === 'wechat') document.body.classList.add('theme-wechat');
+    if (t === 'qq') document.body.classList.add('theme-qq');
+    if (t === 'pink') document.body.classList.add('theme-pink');
+    if (t === 'simple') document.body.classList.add('theme-simple');
+}
+const THEMES = [
+    { id: 'default', name: '默认主题', desc: '清新粉白', previewBg: 'linear-gradient(135deg,#f5f0ff,#fdf0f5)', recvBg: 'rgba(255,255,255,0.78)', recvColor: '#222', sentBg: 'rgba(34,34,34,0.88)', sentColor: '#fff' },
+    { id: 'wechat', name: '微信主题', desc: '真实微信风格', previewBg: 'linear-gradient(135deg,#ededed,#d8d8d8)', recvBg: '#fff', recvColor: '#111', sentBg: '#95ec69', sentColor: '#111' },
+    { id: 'qq', name: 'QQ主题', desc: '蓝白气泡', previewBg: 'linear-gradient(135deg,#4a90d9,#6ab0f0)', recvBg: '#fff', recvColor: '#222', sentBg: '#4a90d9', sentColor: '#fff' },
+    { id: 'pink', name: '粉嫩气泡主题', desc: '甜心粉色', previewBg: 'linear-gradient(135deg,#ffb6c1,#ffd1dc)', recvBg: '#fff5f7', recvColor: '#d64a6a', sentBg: '#ffb6c1', sentColor: '#fff' },
+    { id: 'simple', name: '简约主题', desc: '黑白极简', previewBg: 'linear-gradient(135deg,#f5f5f5,#e8e8e8)', recvBg: '#fff', recvColor: '#222', sentBg: '#222', sentColor: '#fff' }
+];
+function openStorePage() { goPage('home'); closeGamePage(); closeDivinePage(); document.getElementById('storePage').classList.add('active'); renderStore(); }
+function closeStorePage() { document.getElementById('storePage').classList.remove('active'); }
+function renderStore() {
+    const container = document.getElementById('storeContent');
+    let html = '<div class="theme-grid">';
+    THEMES.forEach(t => {
+        const active = appData.activeTheme === t.id;
+        html += `<div class="theme-card ${active ? 'active-theme' : ''}" onclick="applyTheme('${t.id}')"><div class="theme-preview" style="background:${t.previewBg};"><div class="theme-msg-demo"><div class="theme-bubble-demo recv" style="background:${t.recvBg};color:${t.recvColor};">对方消息</div><div class="theme-bubble-demo sent" style="background:${t.sentBg};color:${t.sentColor};">我的消息</div></div></div><div class="theme-info"><div class="theme-name">${t.name}</div><div class="theme-status">${active ? '已使用' : '点击应用'}</div></div></div>`;
+    });
+    html += '</div>';
+    container.innerHTML = html;
+}
+function applyTheme(themeId) {
+    const theme = THEMES.find(t => t.id === themeId); if (!theme) return;
+    appData.activeTheme = themeId;
+    saveData(); applyThemeClass(); applyWallpaper(); renderStore();
+}
+
+// ================= 编辑资料 =================
+function editCoupleInfo() {
+    showModal(`<h3>编辑信息</h3><div style="border-bottom:1px dashed rgba(0,0,0,0.1);margin-bottom:10px;padding-bottom:10px;"><div class="form-group"><label>对方昵称</label><input id="editPartnerName" value="${escapeHtml(appData.partner.name)}"></div><div class="form-group"><label>对方头像</label><input type="file" id="editPartnerAvatar" accept="image/*"></div></div><div><div class="form-group"><label>我的昵称</label><input id="editMyName" value="${escapeHtml(appData.myProfile.name)}"></div><div class="form-group"><label>我的头像</label><input type="file" id="editMyAvatar" accept="image/*"></div></div><div class="m-actions"><button class="m-cancel" onclick="closeModal()">取消</button><button class="m-confirm" onclick="saveCoupleInfo()">保存</button></div>`);
+}
+async function saveCoupleInfo() {
+    const pName = document.getElementById('editPartnerName').value.trim(), mName = document.getElementById('editMyName').value.trim();
+    if (pName) appData.partner.name = pName; if (mName) appData.myProfile.name = mName;
+    const partFile = document.getElementById('editPartnerAvatar').files[0], myFile = document.getElementById('editMyAvatar').files[0];
+    if (partFile) appData.partner.avatar = await readFile(partFile); if (myFile) appData.myProfile.avatar = await readFile(myFile);
+    const chat = appData.chats.find(c => c.id === 'c1'); if (chat) { chat.name = appData.partner.name; chat.avatar = appData.partner.avatar; }
+    await saveData(); renderHomeAvatars(); closeModal();
+    if (document.getElementById('chatPage').classList.contains('active') && currentChatId) { const c = appData.chats.find(x => x.id === currentChatId); if (c) { document.getElementById('chatHeaderName').innerHTML = `${c.name} <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>`; document.getElementById('chatHeaderAvatar').innerHTML = c.avatar ? `<img src="${c.avatar}">` : c.name.charAt(0); } }
+}
+// 自定义天数已废弃，改为日期组件
+function showModal(html) { document.getElementById('modalBox').innerHTML = html; document.getElementById('modalOverlay').classList.add('active'); }
+function closeModal() { document.getElementById('modalOverlay').classList.remove('active'); }
+
+function renderChatList() {
+    const box = document.getElementById('chatListContainer');
+    if (appData.chats.length === 0) { box.innerHTML = '<div style="text-align:center;padding:36px;color:#999;">暂无消息</div>'; return; }
+    box.innerHTML = appData.chats.map(c => `<div class="list-item" onclick="openChat('${c.id}')"><div class="list-avatar">${c.avatar ? `<img src="${c.avatar}">` : c.name.charAt(0)}</div><div class="list-info"><div class="list-title">${c.name}</div><div class="list-desc">${c.lastMsg || '暂无消息'}</div></div></div>`).join('');
+}
+function renderSettings() {
+    const s = appData.settings;
+    const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.value = val; };
+    const setTxt = (id, txt) => { const el = document.getElementById(id); if (el) el.textContent = txt; };
+    setVal('replyMin', s.replyDelayMin); setTxt('replyMinVal', s.replyDelayMin + 's');
+    setVal('replyMax', s.replyDelayMax); setTxt('replyMaxVal', s.replyDelayMax + 's');
+    setVal('replyCountMin', s.replyCountMin || 1); setTxt('replyCountMinVal', (s.replyCountMin || 1) + '条');
+    setVal('replyCountMax', s.replyCountMax || 3); setTxt('replyCountMaxVal', (s.replyCountMax || 3) + '条');
+    setVal('momentPostMin', s.momentPostMin); setTxt('momentPostMinVal', s.momentPostMin + '分');
+    setVal('momentPostMax', s.momentPostMax); setTxt('momentPostMaxVal', s.momentPostMax + '分');
+    setVal('momentCommentDelay', s.momentCommentDelay); setTxt('momentCommentDelayVal', s.momentCommentDelay + '分');
+    setVal('momentReplyDelay', s.momentReplyDelay); setTxt('momentReplyDelayVal', s.momentReplyDelay + '分');
+    setVal('quoteProb', s.quoteProbability); setTxt('quoteProbVal', s.quoteProbability + '%');
+    setVal('divineProb', s.divineSendProbability || 20); setTxt('divineProbVal', (s.divineSendProbability || 20) + '%');
+    const divineToggle = document.getElementById('divineSendToggle'); if (divineToggle) divineToggle.classList.toggle('on', s.divineSendEnabled !== false);
+    setVal('letterWriteMin', s.letterWriteMin); setTxt('letterWriteMinVal', s.letterWriteMin + '小时');
+    setVal('letterWriteMax', s.letterWriteMax); setTxt('letterWriteMaxVal', s.letterWriteMax + '小时');
+    setVal('letterReplyMin', s.letterReplyMin); setTxt('letterReplyMinVal', s.letterReplyMin + '小时');
+    setVal('letterReplyMax', s.letterReplyMax); setTxt('letterReplyMaxVal', s.letterReplyMax + '小时');
+}
+function toggleDivineSend() { const el = document.getElementById('divineSendToggle'); el.classList.toggle('on'); appData.settings.divineSendEnabled = el.classList.contains('on'); saveData(); }
+function exportFullBackup() { try { const dataStr = JSON.stringify(appData, null, 2); const blob = new Blob([dataStr], { type: 'application/json' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); const d = new Date(); const stamp = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}_${String(d.getHours()).padStart(2,'0')}${String(d.getMinutes()).padStart(2,'0')}`; a.href = url; a.download = `lovehouse_backup_${stamp}.json`; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url); } catch (err) { alert('导出失败：' + err.message); } }
+function importFullBackup() {
+    const input = document.getElementById('backupImportInput'); input.value = '';
+    input.onchange = (e) => { const file = e.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = async (ev) => { try { const data = JSON.parse(ev.target.result); if (!data || typeof data !== 'object') throw new Error('数据格式无效'); if (!confirm('导入将覆盖当前所有数据，确定继续吗？')) return; const defaults = getDefaultData(); appData = deepMerge(defaults, data); await saveData(); renderHomeAvatars(); updateBadge(); applyGlobalCssToPage(); applyWallpaper(); applyThemeClass(); if (document.getElementById('pageSettings').classList.contains('active')) renderSettings(); applyHomeBg(); alert('导入成功！'); } catch (err) { alert('导入失败：' + err.message); } }; reader.readAsText(file); };
+    input.click();
+}
+
+// 字卡库（带搜索+导入导出）
+function showPublicCardLibModal() {
+    const lib = appData.settings.publicCardLib;
+    showModal(`<h3>公共字卡库</h3>
+    <div style="margin-bottom:10px;"><input id="cardSearchInput" placeholder="搜索字卡..." style="width:100%;padding:8px 12px;border-radius:10px;border:1px solid rgba(0,0,0,0.1);font-size:12px;" oninput="filterCards()"></div>
+    <div style="margin-bottom:12px;display:flex;gap:6px;flex-wrap:wrap;">${lib.groups.map(g => `<button class="btn-sm btn-out" onclick="showCardGroup('${g.id}')">${g.name}</button>`).join('')}</div>
+    <div id="cardGroupContent"></div>
+    <div class="m-actions" style="flex-wrap:wrap;">
+        <button class="m-cancel" onclick="closeModal()">关闭</button>
+        <button class="m-confirm" style="background:#4a90d9;" onclick="exportCardLib()">导出字卡</button>
+        <button class="m-confirm" style="background:#34c759;" onclick="importCardLib()">导入字卡</button>
+    </div>`);
+    if (lib.groups.length > 0) showCardGroup(lib.groups[0].id);
+}
+let currentCardGroupId = null, currentCardType = 'text';
+function showCardGroup(groupId) {
+    currentCardGroupId = groupId;
+    const group = appData.settings.publicCardLib.groups.find(g => g.id === groupId); if (!group) return;
+    const box = document.getElementById('cardGroupContent');
+    box.innerHTML = `<div class="card-type-tabs" style="display:flex;gap:6px;margin-bottom:10px;"><button class="c-tab ${currentCardType==='text'?'active':''}" onclick="switchCardType('text')">文本</button><button class="c-tab ${currentCardType==='sticker'?'active':''}" onclick="switchCardType('sticker')">表情包</button><button class="c-tab ${currentCardType==='emoji'?'active':''}" onclick="switchCardType('emoji')">Emoji</button></div><div style="margin-bottom:10px;max-height:180px;overflow-y:auto;" id="currentCardsBox"></div><div style="border-top:1px dashed rgba(0,0,0,0.1);padding-top:10px;margin-top:10px;"><div style="display:flex;justify-content:space-between;margin-bottom:7px;"><span style="font-size:12px;font-weight:600;color:#666;">新增字卡 (自动去重)</span><span style="font-size:11px;color:#ff4757;cursor:pointer;" onclick="clearCurrentCategory()">清空当前分类</span></div><div id="addBox"></div></div>`;
+    renderCurrentCards(); renderAddBox();
+}
+function filterCards() {
+    const kw = (document.getElementById('cardSearchInput')?.value || '').toLowerCase();
+    const group = appData.settings.publicCardLib.groups.find(g => g.id === currentCardGroupId); if (!group) return;
+    let cards = []; if (currentCardType === 'text') cards = group.textCards || []; if (currentCardType === 'sticker') cards = group.stickerCards || []; if (currentCardType === 'emoji') cards = group.emojiCards || [];
+    const filtered = cards.filter(c => !kw || (currentCardType === 'sticker' ? true : c.toLowerCase().includes(kw)));
+    const box = document.getElementById('currentCardsBox');
+    if (!filtered.length) box.innerHTML = '<div style="font-size:12px;color:#999;text-align:center;padding:9px;">无匹配字卡</div>';
+    else box.innerHTML = filtered.map(c => { const realIdx = cards.indexOf(c); return `<div class="card-list-item">${currentCardType === 'sticker' ? `<img src="${c}">` : escapeHtml(c)}<span class="del-btn" onclick="delCard(${realIdx})">×</span></div>`; }).join('');
+}
+function switchCardType(type) { currentCardType = type; showCardGroup(currentCardGroupId); setTimeout(filterCards, 50); }
+function renderCurrentCards() {
+    const group = appData.settings.publicCardLib.groups.find(g => g.id === currentCardGroupId);
+    let cards = []; if (currentCardType === 'text') cards = group.textCards || []; if (currentCardType === 'sticker') cards = group.stickerCards || []; if (currentCardType === 'emoji') cards = group.emojiCards || [];
+    const box = document.getElementById('currentCardsBox');
+    if (!cards.length) box.innerHTML = '<div style="font-size:12px;color:#999;text-align:center;padding:9px;">暂无字卡</div>';
+    else box.innerHTML = cards.map((c, i) => `<div class="card-list-item">${currentCardType === 'sticker' ? `<img src="${c}">` : escapeHtml(c)}<span class="del-btn" onclick="delCard(${i})">×</span></div>`).join('');
+}
+function clearCurrentCategory() { if (!confirm('确定清空当前分类下的所有字卡吗？')) return; const group = appData.settings.publicCardLib.groups.find(g => g.id === currentCardGroupId); if (currentCardType === 'text') group.textCards = []; if (currentCardType === 'sticker') group.stickerCards = []; if (currentCardType === 'emoji') group.emojiCards = []; saveData(); renderCurrentCards(); }
+function renderAddBox() {
+    const box = document.getElementById('addBox');
+    if (currentCardType === 'sticker') { box.innerHTML = `<button class="btn-sm btn-pri" style="width:100%;padding:9px;" onclick="batchUploadStickers()">批量导入表情包图片</button><div style="font-size:11px;color:#999;margin-top:4px;">提示：每张图片自动生成一条，自动过滤重复图片</div>`; }
+    else { box.innerHTML = `<textarea id="batchTextInput" style="width:100%;height:70px;padding:7px;border-radius:8px;border:1px solid rgba(255,255,255,0.7);background:rgba(255,255,255,0.5);font-family:inherit;font-size:12px;" placeholder="输入内容，按一次回车即为一条（自动去重）"></textarea><button class="btn-sm btn-pri" style="width:100%;padding:9px;margin-top:5px;" onclick="batchAddText()">批量添加</button>`; }
+}
+function batchAddText() {
+    const text = document.getElementById('batchTextInput').value; if (!text.trim()) return;
+    const group = appData.settings.publicCardLib.groups.find(g => g.id === currentCardGroupId);
+    const lines = text.split('\n').map(s => s.trim()).filter(Boolean);
+    let currentArr = currentCardType === 'text' ? group.textCards : group.emojiCards; let addedCount = 0;
+    lines.forEach(line => { if (!currentArr.includes(line)) { currentArr.push(line); addedCount++; } });
+    saveData(); renderCurrentCards(); document.getElementById('batchTextInput').value = '';
+    if (addedCount < lines.length) alert(`成功添加 ${addedCount} 条，已自动过滤 ${lines.length - addedCount} 条重复项`);
+}
+function batchUploadStickers() {
+    const input = document.getElementById('cardImageUploadInput'); input.value = '';
+    input.onchange = async (e) => {
+        const files = Array.from(e.target.files); if (!files.length) return;
+        const group = appData.settings.publicCardLib.groups.find(g => g.id === currentCardGroupId); let addedCount = 0;
+        for (let file of files) { const base64 = await readFile(file); if (!group.stickerCards.includes(base64)) { group.stickerCards.push(base64); addedCount++; } }
+        saveData(); renderCurrentCards();
+        if (addedCount < files.length) alert(`成功导入 ${addedCount} 张，已过滤 ${files.length - addedCount} 张重复图片`); else alert(`成功导入 ${addedCount} 张表情包`);
+    };
+    input.click();
+}
+function delCard(index) { const group = appData.settings.publicCardLib.groups.find(g => g.id === currentCardGroupId); if (currentCardType === 'text') group.textCards.splice(index, 1); if (currentCardType === 'sticker') group.stickerCards.splice(index, 1); if (currentCardType === 'emoji') group.emojiCards.splice(index, 1); saveData(); renderCurrentCards(); }
+function clearAllData() { if (confirm('确定重置所有数据？')) { indexedDB.deleteDatabase(DB_NAME); location.reload(); } }
+function readFile(file) { return new Promise(res => { const r = new FileReader(); r.onload = e => res(e.target.result); r.readAsDataURL(file); }); }
+
+// ================= 字卡库导入导出 =================
+function exportCardLib() {
+    showModal(`<h3>导出字卡库</h3>
+    <div style="font-size:12px;color:#666;margin-bottom:12px;line-height:1.6;">选择要导出的内容，导出为 JSON 文件，可后续导入到本设备或其他设备。</div>
+    <div style="display:flex;flex-direction:column;gap:9px;">
+        <label style="display:flex;align-items:center;gap:7px;font-size:13px;padding:9px;background:rgba(255,255,255,0.6);border-radius:11px;cursor:pointer;">
+            <input type="checkbox" id="exportText" checked> 文本字卡
+        </label>
+        <label style="display:flex;align-items:center;gap:7px;font-size:13px;padding:9px;background:rgba(255,255,255,0.6);border-radius:11px;cursor:pointer;">
+            <input type="checkbox" id="exportSticker" checked> 表情包
+        </label>
+        <label style="display:flex;align-items:center;gap:7px;font-size:13px;padding:9px;background:rgba(255,255,255,0.6);border-radius:11px;cursor:pointer;">
+            <input type="checkbox" id="exportEmoji" checked> Emoji
+        </label>
+        <label style="display:flex;align-items:center;gap:7px;font-size:13px;padding:9px;background:rgba(255,255,255,0.6);border-radius:11px;cursor:pointer;">
+            <input type="checkbox" id="exportKaomoji" checked> 颜文字
+        </label>
+    </div>
+    <div class="m-actions"><button class="m-cancel" onclick="showPublicCardLibModal()">取消</button><button class="m-confirm" onclick="doExportCardLib()">导出</button></div>`);
+}
+
+function doExportCardLib() {
+    const exportText = document.getElementById('exportText').checked;
+    const exportSticker = document.getElementById('exportSticker').checked;
+    const exportEmoji = document.getElementById('exportEmoji').checked;
+    const exportKaomoji = document.getElementById('exportKaomoji').checked;
+    if (!exportText && !exportSticker && !exportEmoji && !exportKaomoji) { alert('请至少选择一项'); return; }
+
+    const groups = appData.settings.publicCardLib.groups;
+    const exportData = { version: 1, exportedAt: Date.now(), groups: [] };
+
+    groups.forEach(g => {
+        const groupData = { id: g.id, name: g.name };
+        let hasContent = false;
+        if (exportText && g.textCards && g.textCards.length) { groupData.textCards = g.textCards; hasContent = true; }
+        if (exportEmoji && g.emojiCards && g.emojiCards.length) { groupData.emojiCards = g.emojiCards; hasContent = true; }
+        if (exportKaomoji && g.kaomojiCards && g.kaomojiCards.length) { groupData.kaomojiCards = g.kaomojiCards; hasContent = true; }
+        if (exportSticker && g.stickerCards && g.stickerCards.length) { groupData.stickerCards = g.stickerCards; hasContent = true; }
+        if (hasContent) exportData.groups.push(groupData);
+    });
+
+    if (!exportData.groups.length) { alert('没有可导出的字卡内容'); return; }
+
+    try {
+        const dataStr = JSON.stringify(exportData, null, 2);
+        const blob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        const d = new Date();
+        const stamp = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}_${String(d.getHours()).padStart(2,'0')}${String(d.getMinutes()).padStart(2,'0')}`;
+        a.href = url;
+        a.download = `lovehouse_cards_${stamp}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        closeModal();
+        setTimeout(() => showPublicCardLibModal(), 300);
+    } catch (err) {
+        alert('导出失败：' + err.message);
+    }
+}
+
+function importCardLib() {
+    const input = document.getElementById('cardLibImportInput');
+    if (!input) return;
+    input.value = '';
+    input.onchange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            try {
+                const data = JSON.parse(ev.target.result);
+                if (!data || !Array.isArray(data.groups)) throw new Error('不是有效的字卡库文件（需为 JSON 格式）');
+                applyImportedCardLib(data);
+            } catch (err) {
+                alert('导入失败：' + err.message);
+            }
+        };
+        reader.readAsText(file);
+    };
+    input.click();
+}
+
+function applyImportedCardLib(data) {
+    let textCount = 0, stickerCount = 0, emojiCount = 0, kaomojiCount = 0;
+
+    data.groups.forEach(importedGroup => {
+        let targetGroup = appData.settings.publicCardLib.groups.find(g => g.name === importedGroup.name);
+        if (!targetGroup) {
+            targetGroup = {
+                id: 'cg' + Date.now() + Math.random().toString(36).slice(2,6),
+                name: importedGroup.name || '导入分组',
+                textCards: [], emojiCards: [], kaomojiCards: [], stickerCards: []
+            };
+            appData.settings.publicCardLib.groups.push(targetGroup);
+        }
+        ['textCards','emojiCards','kaomojiCards','stickerCards'].forEach(k => { if (!Array.isArray(targetGroup[k])) targetGroup[k] = []; });
+
+        if (Array.isArray(importedGroup.textCards)) {
+            importedGroup.textCards.forEach(c => { if (!targetGroup.textCards.includes(c)) { targetGroup.textCards.push(c); textCount++; } });
+        }
+        if (Array.isArray(importedGroup.stickerCards)) {
+            importedGroup.stickerCards.forEach(c => { if (!targetGroup.stickerCards.includes(c)) { targetGroup.stickerCards.push(c); stickerCount++; } });
+        }
+        if (Array.isArray(importedGroup.emojiCards)) {
+            importedGroup.emojiCards.forEach(c => { if (!targetGroup.emojiCards.includes(c)) { targetGroup.emojiCards.push(c); emojiCount++; } });
+        }
+        if (Array.isArray(importedGroup.kaomojiCards)) {
+            importedGroup.kaomojiCards.forEach(c => { if (!targetGroup.kaomojiCards.includes(c)) { targetGroup.kaomojiCards.push(c); kaomojiCount++; } });
+        }
+    });
+
+    saveData();
+    renderCurrentCards();
+    alert(`导入完成！\n文本：${textCount} 条\n表情包：${stickerCount} 张\nEmoji：${emojiCount} 个\n颜文字：${kaomojiCount} 条\n（已自动去重）`);
+    setTimeout(() => showPublicCardLibModal(), 300);
+}
+
+// ================= 启动 =================
+async function init() {
+    try {
+        await openDB(); await loadData();
+        if (!appData.chats || appData.chats.length === 0) {
+            appData.chats = [{ id: 'c1', name: appData.partner.name, avatar: appData.partner.avatar, lastMsg: '晚上吃什么？', unread: 1, messages: [{ id: 'm1', sender: 'other', text: '在干嘛呢？', type: 'text', time: Date.now() - 60000 }, { id: 'm2', sender: 'other', text: '晚上吃什么？', type: 'text', time: Date.now() - 30000 }] }];
+        }
+        if (!Array.isArray(appData.letters)) appData.letters = [];
+        if (!Array.isArray(appData.moments)) appData.moments = [];
+        if (!Array.isArray(appData.diary)) appData.diary = [];
+        if (appData.settings.replyCountMin === undefined) appData.settings.replyCountMin = 1;
+        if (appData.settings.replyCountMax === undefined) appData.settings.replyCountMax = 3;
+        if (appData.settings.divineSendEnabled === undefined) appData.settings.divineSendEnabled = true;
+        if (appData.settings.divineSendProbability === undefined) appData.settings.divineSendProbability = 20;
+        if (appData.settings.gomokuEasyMode === undefined) appData.settings.gomokuEasyMode = false;
+        if (!appData.activeTheme) appData.activeTheme = 'default';
+        
+        // 兼容处理：如果之前是老版本的数字时间戳，转换为字符串日期 YYYY-MM-DD
+        if (typeof appData.partner.startDate === 'number') {
+            const d = new Date(appData.partner.startDate);
+            appData.partner.startDate = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+        }
+        if (!appData.partner.startDate) appData.partner.startDate = '2023-08-02';
+
+        await saveData();
+        updateClock(); renderHomeAvatars(); updateBadge(); applyGlobalCssToPage(); applyHomeBg(); applyThemeClass(); renderSettings(); setupDoubleClickQuote(); applyWallpaper();
+    } catch (err) { console.error('初始化失败:', err); updateClock(); renderHomeAvatars(); updateBadge(); }
+}
+init();
+</script>
+</body>
+</html>
